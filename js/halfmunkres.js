@@ -72,16 +72,50 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
         for (let b = 0; b < size2; ++b) {
             if (M[a][b] === 1) {
                 let pair1 = bp1[a];
-                let x1 = pair1[1][0];
-                let y1 = pair1[1][1];
-                x1 = x1*4/sizeX-2;
-                y1 = y1*4/sizeY-2;
+                let x10 = pair1[0][0];
+                let y10 = pair1[0][1];
+                let x11 = pair1[1][0];
+                let y11 = pair1[1][1];
+                let type1 = getCriticalType(sizeX, sizeY, x10, y10, (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
+                let type2 = getCriticalType(sizeX, sizeY, x11, y11, (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
+                let x1, y1;
+                if (type1 === 'max' && type2 === 'min') {
+                    x1 = x10*4/sizeX-2;
+                    y1 = y10*4/sizeY-2;
+                } else if (type1 === 'min' && type2 === 'max') {
+                    x1 = x11*4/sizeX-2;
+                    y1 = y11*4/sizeY-2;
+                } else if (type1 === 'max' || type1 === 'min') {
+                    x1 = x10*4/sizeX-2;
+                    y1 = y10*4/sizeY-2;
+                } else if (type2 === 'min' || type2 === 'max') {
+                    x1 = x11*4/sizeX-2;
+                    y1 = y11*4/sizeY-2;
+                }
+
                 let v1 = multisineT(t1, x1, y1);
                 let pair2 = bp2[b];
-                let x2 = pair2[1][0];
-                let y2 = pair2[1][1];
-                x2 = x2*4/sizeX-2;
-                y2 = y2*4/sizeY-2;
+                let x20 = pair2[0][0];
+                let y20 = pair2[0][1];
+                let x21 = pair2[1][0];
+                let y21 = pair2[1][1];
+                let x2, y2;
+                let type10 = getCriticalType(sizeX, sizeY, x20, y20, (x, y) => multisineT(t2, x*4/sizeX-2, y*4/sizeY-2));
+                let type20 = getCriticalType(sizeX, sizeY, x21, y21, (x, y) => multisineT(t2, x*4/sizeX-2, y*4/sizeY-2));
+                if (type10 === 'max' && type20 === 'min') {
+                    x2 = x20*4/sizeX-2;
+                    y2 = y20*4/sizeY-2;
+                } else if (type10 === 'min' && type20 === 'max') {
+                    x2 = x21*4/sizeX-2;
+                    y2 = y21*4/sizeY-2;
+                } else if (type10 === 'max' || type10 === 'min') {
+                    x2 = x20*4/sizeX-2;
+                    y2 = y20*4/sizeY-2;
+                } else if (type20 === 'min' || type20 === 'max') {
+                    x2 = x21*4/sizeX-2;
+                    y2 = y21*4/sizeY-2;
+                }
+
                 let v2 = multisineT(t2, x2, y2);
                 seg.push([x1, y1, v1, x2, y2, v2]);
                 // m.set(a, b);

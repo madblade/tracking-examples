@@ -51,8 +51,8 @@ slide
     .area({ axes: [1, 3], channels: 3, width: 10, height: pd.length, expr: emitCriticalPath })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
     .slide()
-    .area({ axes: [1, 3], channels: 3, width: 10, height: 10, expr: emitTracking })
-    .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 });
+    .area({ axes: [1, 3], channels: 3, width: 100, height: 100, expr: emitTracking })
+    .line({color: '#1fff00', size: 15, opacity: 1, zIndex: 2 });
 
 // color: '#B8860B',
 

@@ -40,74 +40,61 @@ function upperNeighbors(octoPoint, f)
     return neighbors;
 }
 
-function computeCriticalPoints(s1, s2, f)
+function getCriticalType(s1, s2, i, j, f)
 {
-    let pointType = new Array(s1);
-    for (let i = 0; i < s1; ++i) pointType[i] = new Array(s2);
-    let criticalPoints = [];
-
     // Compute critical points
-    for (let i = 0; i < s1; ++i) {
-        for (let j = 0; j < s2; ++j) {
-            let currentValue = f(i, j);
-            let nBools = [
-                f(i + 1, j)     > currentValue || (f(i + 1, j)     === currentValue && (i+1) * s1 + j < i * s1 + j) ,
-                f(i + 1, j + 1) > currentValue || (f(i + 1, j + 1) === currentValue && (i+1) * s1 + j+1 < i * s1 + j) ,
-                f(i, j + 1)     > currentValue || (f(i, j + 1)     === currentValue && (i) * s1 + j+1 < i * s1 + j) ,
-                f(i - 1, j)     > currentValue || (f(i - 1, j)     === currentValue && (i-1) * s1 + j < i * s1 + j) ,
-                f(i - 1, j - 1) > currentValue || (f(i - 1, j - 1) === currentValue && (i-1) * s1 + j-1 < i * s1 + j) ,
-                f(i, j - 1)     > currentValue || (f(i, j - 1)     === currentValue && (i) * s1 + j-1 < i * s1 + j) ,
-            ];
-            let nbPlus = 0;
-            let nbMinus = 0;
-            let currentPlus = false;
-            let currentMinus = false;
-            let nbComponentPlus = 0;
-            let nbComponentMinus = 0;
-            for (let k = 0; k < nBools.length; ++k) {
-                if (nBools[k]) {
-                    nbPlus++;
-                    if (!currentPlus) nbComponentPlus++;
-                    currentPlus = true;
-                    if (currentMinus) currentMinus = false;
-                } else {
-                    nbMinus++;
-                    if (!currentMinus) nbComponentMinus++;
-                    currentMinus = true;
-                    if (currentPlus) currentPlus = false;
-                }
-            }
-            // Don't forget to test modulo k!
-            if (nBools[0]) {
-                if (currentPlus && nbComponentMinus > 0) nbComponentPlus--;
-            } else {
-                if (currentMinus && nbComponentPlus > 0) nbComponentMinus--;
-            }
-
-            if (nbComponentPlus === 0 && nbComponentMinus > 0) {
-                pointType[i][j] = "max";
-                criticalPoints.push([i, j, 'max', currentValue]);
-            }
-            if (nbComponentPlus > 0 && nbComponentMinus === 0) {
-                pointType[i][j] = "min";
-                criticalPoints.push([i, j, 'min', currentValue]);
-            }
-            if (nbComponentPlus + nbComponentMinus > 2) {
-                pointType[i][j] = "sad";
-                criticalPoints.push([i, j, 'sad', currentValue]);
-            }
-            if (nbComponentMinus === 0 && nbComponentPlus === 0)
-                console.log('No neighbors?');
-            if (nbComponentMinus + nbComponentPlus > 4) {
-                pointType[i][j] = "mul";
-                console.log('Multi-saddle?');
-            }
-            if (!pointType[i][j])
-                pointType[i][j] = "reg";
+    let currentValue = f(i, j);
+    let nBools = [
+        f(i + 1, j)     > currentValue || (f(i + 1, j)     === currentValue && (i+1) * s1 + j < i * s1 + j) ,
+        f(i + 1, j + 1) > currentValue || (f(i + 1, j + 1) === currentValue && (i+1) * s1 + j+1 < i * s1 + j) ,
+        f(i, j + 1)     > currentValue || (f(i, j + 1)     === currentValue && (i) * s1 + j+1 < i * s1 + j) ,
+        f(i - 1, j)     > currentValue || (f(i - 1, j)     === currentValue && (i-1) * s1 + j < i * s1 + j) ,
+        f(i - 1, j - 1) > currentValue || (f(i - 1, j - 1) === currentValue && (i-1) * s1 + j-1 < i * s1 + j) ,
+        f(i, j - 1)     > currentValue || (f(i, j - 1)     === currentValue && (i) * s1 + j-1 < i * s1 + j) ,
+    ];
+    let nbPlus = 0;
+    let nbMinus = 0;
+    let currentPlus = false;
+    let currentMinus = false;
+    let nbComponentPlus = 0;
+    let nbComponentMinus = 0;
+    for (let k = 0; k < nBools.length; ++k) {
+        if (nBools[k]) {
+            nbPlus++;
+            if (!currentPlus) nbComponentPlus++;
+            currentPlus = true;
+            if (currentMinus) currentMinus = false;
+        } else {
+            nbMinus++;
+            if (!currentMinus) nbComponentMinus++;
+            currentMinus = true;
+            if (currentPlus) currentPlus = false;
         }
     }
+    // Don't forget to test modulo k!
+    if (nBools[0]) {
+        if (currentPlus && nbComponentMinus > 0) nbComponentPlus--;
+    } else {
+        if (currentMinus && nbComponentPlus > 0) nbComponentMinus--;
+    }
 
-    return criticalPoints;
+    let type = "reg";
+    if (nbComponentPlus === 0 && nbComponentMinus > 0) {
+        type = "max";
+    }
+    if (nbComponentPlus > 0 && nbComponentMinus === 0) {
+        type = "min";
+    }
+    if (nbComponentPlus + nbComponentMinus > 2) {
+        type = "sad";
+    }
+    if (nbComponentMinus === 0 && nbComponentPlus === 0)
+        console.log('No neighbors?');
+    if (nbComponentMinus + nbComponentPlus > 4) {
+        type = "mul";
+    }
+
+    return type;
 }
 
 function computePersistenceDiagram(s1, s2, f)
@@ -431,28 +418,33 @@ var emitCriticalPoints = function(emit, i, t, type) {
 var emitTracking = function(emit, x, y, i, j, t) {
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
     let it = Math.floor(t1 * nbDiagBourrin);
-    let n = it - 10 + i;
+    let n = it - 100 + i;
     if (n < 0) {
-        emit(0, 0, 0);
+        //emit(10, 10, 10);
         return;
     }
     let T = TT[n];
     if (!T) {
-        emit(0, 0, 0);
+        //emit(10, 10, 10);
         return;
     }
 
     var sextuplet = T[j];
-    if (!sextuplet) emit(0, 0, 0);
+    if (!sextuplet) {
+        //emit(10, 10, 10);
+        return;
+    }
     let x0 = sextuplet[0];
-    let x1 = sextuplet[1];
-    let y0 = sextuplet[3];
+    let y0 = sextuplet[1];
+    let z0 = sextuplet[2];
+    let x1 = sextuplet[3];
     let y1 = sextuplet[4];
+    let z1 = sextuplet[5];
 
     var newX, newY, newZ;
     newX = x0 + (1) * (x1 - x0);
     newY = y0 + (1) * (y1 - y0);
-    newZ = multisineT(t, newX, newY);
+    newZ = z0 + (1) * (z1 - z0); // multisineT(t, newX, newY);
     return emit(newX, newY, newZ);
 };
 
