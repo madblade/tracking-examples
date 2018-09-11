@@ -23,12 +23,13 @@ for (let i = 0; i < bourrinpd.length; ++i)
         }
         let xx = (Math.min(val1, val2) - min)/ range;
         let yy = (Math.abs(val1 - val2) - min)/ range;
-        data.push({x: xx, y: yy, i: j});
+        data.push({x: xx, y: yy, i: j, x12d: x1, x22d: x2, y12d: y1, y22d: y2});
     }
 
     allDiags.push(data);
 }
 
+let TTT = [];
 let TT = [];
 for (let i = 0; i < bourrinpd.length - 2; ++i) {
     let pdData1 = allDiags[i];
@@ -63,7 +64,7 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
     // Assign.
     let bp1 = bourrinpd[i];
     let bp2 = bourrinpd[i+1];
-    //let m = new Map();
+    let m = new Map();
     let seg = [];
     let t1 = 2 * Math.PI * i / nbDiagBourrin;
     let t2 = 2 * Math.PI * (i+1) / nbDiagBourrin;
@@ -92,8 +93,8 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
                     x1 = x11*4/sizeX-2;
                     y1 = y11*4/sizeY-2;
                 }
-
                 let v1 = multisineT(t1, x1, y1);
+
                 let pair2 = bp2[b];
                 let x20 = pair2[0][0];
                 let y20 = pair2[0][1];
@@ -117,19 +118,92 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
                 }
 
                 let v2 = multisineT(t2, x2, y2);
-                seg.push([x1, y1, v1, x2, y2, v2]);
-                // m.set(a, b);
+                let dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+                if (dist < 0.5) {
+                    //console.log(x1+','+x2);
+                    seg.push([x1, y1, v1, x2, y2, v2]);
+                }
             }
         }
     }
 
-    TT.push(seg);
-    // TT.push(m);
+    TTT.push(seg);
 }
 
 // Process trackings.
 //console.log(bourrinpd);
-console.log(TT);
+//console.log(TTT);
+TT.push(TTT[0]);
+for (let i = 0; i < TTT.length - 2; ++i) {
+    let newT = [];
+    let currentT = TT[i];
+    let nextT = TTT[i+1];
+    let foundJ = new Array(nextT.length);
+    foundJ.fill(false);
+    for (let k = 0; k < currentT.length; ++k) {
+        if (!currentT[k]) continue;
+        let foundK = false;
+        for (let j = 0; j < nextT.length; ++j) { // this is so ugly
+            if (foundJ[j]) continue; // ugh
+            if (currentT[k][3] === nextT[j][0] && currentT[k][4] === nextT[j][1] && currentT[k][5] === nextT[j][2])
+            {
+                newT[k] = nextT[j];
+                foundK = true;
+                foundJ[j] = true;
+                break;
+            }
+        }
+    }
+    for (let j = 0; j < nextT.length; ++j) {
+        if (!foundJ[j]) {
+            let s = Math.max(nextT.length, newT.length);
+            for (let h = 0; h < TT.length; ++h) {
+                s = Math.max(s, TT[h].length);
+            }
+            newT[s] = nextT[j];
+        }
+    }
+    TT.push(newT);
+}
+let largest = 0;
+for (let i = 0; i < TT.length; ++i) {
+    if (TT[i].length > largest) largest = TT[i].length;
+}
+for (let i = 0; i < TT.length; ++i) {
+    let TTT = TT[i];
+
+    for (let k = 0; k < largest; ++k) {
+        let cur = TTT[k];
+
+        if (!cur) {
+            let firstId = 0;
+            let first;
+            let lastId = TT.length - 1;
+            let last;
+            for (let j = 0; j < TT.length; ++j) {
+                if (TT[j][k]) {
+                    firstId = j;
+                    first = TT[j][k];
+                    break;
+                }
+            }
+            for (let j = TT.length - 1; j >= 0; --j) {
+                if (TT[j][k]) {
+                    lastId = j;
+                    last = TT[j][k];
+                    break;
+                }
+            }
+            for (let j = 0; j < TT.length; ++j) {
+                if (!TT[j][k]) {
+                    if (j < firstId) TT[j][k] = first;
+                    if (j > lastId) TT[j][k] = last;
+                }
+            }
+        }
+    }
+}
+// console.log(TT);
 
 var halfMunkresRunningInterval;
 function launchHalfMunkres(

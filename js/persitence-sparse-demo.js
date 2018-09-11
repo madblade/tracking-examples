@@ -415,24 +415,71 @@ var emitCriticalPoints = function(emit, i, t, type) {
 };
 
 // console.log(bourrinpd);
+var emitTrackingBis = function(emit, x, y, i, j) {
+    let T = TT[i];
+    if (!T) {
+        for (let ii = i; ii >= 0; --ii)
+        {
+            T = TT[ii];
+            if (T) break;
+        }
+        // return emit(0,0,0);
+    }
+    var sextuplet = T[j];
+    if (!sextuplet) {
+        for (let jj = j; jj >= 0; --jj) {
+            if (T[jj]) {
+                sextuplet = T[jj];
+                break;
+            }
+        }
+    }
+    let x0 = sextuplet[0];
+    let y0 = sextuplet[1];
+    let z0 = sextuplet[2];
+    let x1 = sextuplet[3];
+    let y1 = sextuplet[4];
+    let z1 = sextuplet[5];
+    var newX, newY, newZ;
+    var factor = 0;
+    newX = x0 + (factor) * (x1 - x0);
+    newY = y0 + (factor) * (y1 - y0);
+    newZ = z0 + (factor) * (z1 - z0); // multisineT(t, newX, newY);
+    return emit(newX, newY, newZ);
+};
+
 var emitTracking = function(emit, x, y, i, j, t) {
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
     let it = Math.floor(t1 * nbDiagBourrin);
     let n = it - 100 + i;
-    if (n < 0) {
+
+    // let factor = n % 2 === 0 ? 0 : 1;
+    let factor = 0;
+    if (n < 1) {
+        n = 1;
         //emit(10, 10, 10);
-        return;
+        // return emit(0,0,0);
     }
     let T = TT[n];
     if (!T) {
         //emit(10, 10, 10);
-        return;
+        for (let jj = n; jj >= 0; --jj) {
+            T = TT[jj];
+            if (T) break;
+        }
+        if (!T) return emit(0,0,0);
     }
 
     var sextuplet = T[j];
     if (!sextuplet) {
+        for (let jj = j; jj >= 0; --jj) {
+            let st = T[jj];
+            if (st) {
+                sextuplet = st;
+            }
+        }
         //emit(10, 10, 10);
-        return;
+        if (!sextuplet) return emit(0,0,0);
     }
     let x0 = sextuplet[0];
     let y0 = sextuplet[1];
@@ -442,9 +489,9 @@ var emitTracking = function(emit, x, y, i, j, t) {
     let z1 = sextuplet[5];
 
     var newX, newY, newZ;
-    newX = x0 + (1) * (x1 - x0);
-    newY = y0 + (1) * (y1 - y0);
-    newZ = z0 + (1) * (z1 - z0); // multisineT(t, newX, newY);
+    newX = x0 + (factor) * (x1 - x0);
+    newY = y0 + (factor) * (y1 - y0);
+    newZ = z0 + (factor) * (z1 - z0); // multisineT(t, newX, newY);
     return emit(newX, newY, newZ);
 };
 

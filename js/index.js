@@ -50,21 +50,28 @@ slide
     .slide()
     .area({ axes: [1, 3], channels: 3, width: 10, height: pd.length, expr: emitCriticalPath })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
-    .slide()
+    .slide().slide()
     .area({ axes: [1, 3], channels: 3, width: 100, height: 100, expr: emitTracking })
     .line({color: '#1fff00', size: 15, opacity: 1, zIndex: 2 });
 
 // color: '#B8860B',
 
 let nbSlides = 15;
-$(window).keydown(function(e) {
+// $(window).keydown(function(e) {});
 
-});
-
+$('#halfmunkres').hide();
 top.onkeydown = function(e) {
     switch (e.keyCode) {
-        case 81: return present[0].set('index', Math.max(present[0].get('index') - 1, 0));
-        case 68: console.log("Next slide.");
+        case 81:
+            let a = present[0].get('index') + 1;
+            //console.log(a);
+            if (a < 11) $('#halfmunkres').hide();
+            return present[0].set('index', Math.max(present[0].get('index') - 1, 0));
+        case 68:
+            let b = present[0].get('index') + 1;
+            //console.log(b);
+            if (b > 11) $('#halfmunkres').show();
+            console.log("Next slide.");
             return present[0].set('index', Math.min(present[0].get('index') + 1, nbSlides));
     }
 };

@@ -1,8 +1,14 @@
+var cPers = 0.5;
+
 function distagonal(pair)
 {
     let x = pair.x;
     let y = pair.y;
-    return Math.sqrt(Math.pow(y, 2));
+    let x12d = pair.x12d;
+    let y12d = pair.y12d;
+    let x22d = pair.x22d;
+    let y22d = pair.y22d;
+    return Math.sqrt(cPers * Math.pow(y, 2) + Math.pow(x12d - x22d, 2) + Math.pow(y12d - y22d, 2));
 }
 
 function distance(pair1, pair2)
@@ -11,7 +17,22 @@ function distance(pair1, pair2)
     let x2 = pair2.x;
     let y1 = pair1.y;
     let y2 = pair2.y;
-    return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+    let x12d = pair1.x12d;
+    let x22d = pair1.x22d;
+    let y12d = pair1.y12d;
+    let y22d = pair1.y22d;
+    let p1x = (x12d + x22d) * 0.5;
+    let p1y = (y12d + y22d) * 0.5;
+
+    let x12d2 = pair2.x12d;
+    let x22d2 = pair2.x22d;
+    let y12d2 = pair2.y12d;
+    let y22d2 = pair2.y22d;
+    let p2x = (x12d2 + x22d2) * 0.5;
+    let p2y = (y12d2 + y22d2) * 0.5;
+
+    return Math.sqrt(cPers * Math.pow(x1 - x2, 2) + cPers * Math.pow(y1 - y2, 2) +
+            Math.pow(p1x - p2x, 2) + Math.pow(p1y - p2y, 2));
 }
 
 function getGrid(
