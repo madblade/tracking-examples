@@ -119,7 +119,7 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
 
                 let v2 = multisineT(t2, x2, y2);
                 let dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-                if (dist < 0.5) {
+                if (dist < 0.1) {
                     //console.log(x1+','+x2);
                     seg.push([x1, y1, v1, x2, y2, v2]);
                 }

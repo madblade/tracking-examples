@@ -15,8 +15,8 @@ var view = mathbox.cartesian({range: [[-2, 2], [-2, 2], [-2, 2]], scale: [4, 4, 
 mathbox.set('focus', 3);
 
 /** ############## MATH */
-var sizeX = 50;
-var sizeY = 25;
+var sizeX = 100;
+var sizeY = 50;
 //var sizeX = 40;
 //var sizeY = 20;
 
@@ -272,6 +272,8 @@ function computePersistenceDiagram(s1, s2, f)
                     if (starterType === "min") {
                         // Completed current min-sad pair.
                         processedCritical.add(hash2);
+                        // Not considering min-sad pairs!
+                        // TODO uncomment
                         persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]]]);
                         builtPair = true;
                     } else if (starterType === "sad"){
@@ -309,7 +311,7 @@ function computePersistenceDiagram(s1, s2, f)
                 let ct = pointType[c[0]][c[1]];
                 if (ct === 'max') {
                     nbMaxNotAssigned++;
-                    if (nbMaxNotAssigned>1)
+                    if (nbMaxNotAssigned > 1)
                     console.log('A max was not assigned, this should only happen on the border.');
                 }
                 else if (ct === 'min' || ct === 'sad')
@@ -344,25 +346,35 @@ function computeD3PersistenceDiagram(sizeX, sizeY, pd, f)
     return pers;
 }
 
+var stretcher = 0.5;
+
 function mainFunction(x, y) {
-    return (π / 2 + .6 * Math.sin(x - y + 2 * Math.sin(y)) + .3 * Math.sin(x * 2 + y * 2 * 1.81)
-        + .1825 * Math.sin(x * 3 - y * 2 * 2.18)) - .5;
+    let xx = x * stretcher;
+    let yy = y * stretcher;
+    return 0.5 + (1 / stretcher) * (π / 2
+        + .6 * Math.sin(xx - yy + 2 * Math.sin(yy))
+        + .3 * Math.sin(xx * 2 + yy * 2 * 1.81)
+        + .1825 * Math.sin(xx * 3 - yy * 2 * 2.18)) - .5;
 }
 
 // My function:
 // 1.570796 + .6 * sin(x - y + 2 * sin(y)) + .3 * sin(x * 2 + y * 2 * 1.81) + .1825 * sin(x * 3 - y * 2 * 2.18)) -.5
 function multisine(x, y) {
-    return (π / 2
-        + .6 *    Math.sin(x - y + 2 * Math.sin(y))
-        + .3 *    Math.sin(x * 2 + y * 2 * 1.81)
-        + .1825 * Math.sin(x * 3 - y * 2 * 2.18)) - .5
+    let xx = x * stretcher;
+    let yy = y * stretcher;
+    return 0.5 + (1 / stretcher) * (π / 2
+        + .6 *    Math.sin(xx - yy + 2 * Math.sin(yy))
+        + .3 *    Math.sin(xx * 2 + yy * 2 * 1.81)
+        + .1825 * Math.sin(xx * 3 - yy * 2 * 2.18)) - .5
 }
 
 function multisineT(t, x, y) {
-    return (π / 2
-        + .6 * Math.sin(x + t - y + 2 * Math.sin(y))
-        + .3 * Math.sin(x * 2 + t + y * 2 * 1.81)
-        + .1825 * Math.sin(x * 3 + t - y * 2 * 2.18)) - .5;
+    let xx = x * stretcher;
+    let yy = y * stretcher;
+    return 0.5 + (1 / stretcher) * (π / 2
+        + .6 * Math.sin(xx + t - yy + 2 * Math.sin(yy))
+        + .3 * Math.sin(xx * 2 + t + yy * 2 * 1.81)
+        + .1825 * Math.sin(xx * 3 + t - yy * 2 * 2.18)) - .5;
 }
 
 var emitSurfaceBlop = function (emit, x, y, i, j) {

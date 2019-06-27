@@ -24,7 +24,7 @@ slide
     .surface({ zBias: 3, shaded: true, color: '#ff9d00', opacity: 0.8})
     .slide()
     .array({ id: 'sampler2', length: dataCritMin.length, data: dataCritMin, items: 3, channels: 3 })
-    .point({ color: '#0000AA', size: 20, zIndex: 2})
+    .point({ color: '#0000ff', size: 20, zIndex: 2})
     .slide()
     .array({ id: 'sampler3', length: dataCritMax.length, data: dataCritMax, items: 3, channels: 3})
     .point({ color: '#ff0b00', size: 20, zIndex: 2})
@@ -52,7 +52,9 @@ slide
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
     .slide().slide()
     .area({ axes: [1, 3], channels: 3, width: 100, height: 100, expr: emitTracking })
-    .line({color: '#1fff00', size: 15, opacity: 1, zIndex: 2 });
+    .line({color: '#000000', size: 20, opacity: 1, zIndex: 2 });
+    //.vector({color: '#000000', size: 10, opacity: 1, zIndex: 2 });
+    //.ticks({color: '#000000', opacity: 1, zIndex: 2 });
 
 // color: '#B8860B',
 
@@ -70,7 +72,7 @@ top.onkeydown = function(e) {
         case 68:
             let b = present[0].get('index') + 1;
             //console.log(b);
-            if (b > 11) $('#halfmunkres').show();
+            // if (b > 11) $('#halfmunkres').show();
             console.log("Next slide.");
             return present[0].set('index', Math.min(present[0].get('index') + 1, nbSlides));
     }
