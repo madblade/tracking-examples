@@ -20,6 +20,14 @@
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <title>sparsity</title>
 </head>
+
+<button id="rightbutton">
+    <p><i class="arrow right"></i></p>
+</button>
+<button id="leftbutton">
+    <p><i class="arrow left"></i></p>
+</button>
+
 <body>
 
 <!-- Latest compiled and minified JavaScript -->
@@ -55,17 +63,8 @@
     }
 </script>
 
-<script src = "cdn/mathbox-bundle.min.js"></script>
-<script src = "js/color.js"></script>
-<script src = "js/grid.js"></script>
-<script src = "js/persistencediag.js"></script>
-<script src = "js/sparse-demo.js"></script>
-<script src = "js/persitence-sparse-demo.js"></script>
-<script src = "js/halfmunkres.js"></script>
-<script src = "js/index.js"></script>
-
-<div class="container col-sm-12 panel panel-default" id="halfmunkres">
-    <!--style="display:none">-->
+<div class="container col-sm-12 panel panel-default" id="halfmunkres"
+     style="display:none">
     <div class="row text-center panel panel-default">
         Persistence diagrams
     </div>
@@ -75,6 +74,15 @@
     </div>
     <div id="grid"></div>
 </div>
+
+<script src = "cdn/mathbox-bundle.min.js"></script>
+<script src = "js/color.js"></script>
+<script src = "js/grid.js"></script>
+<script src = "js/persistencediag.js"></script>
+<script src = "js/sparse-demo.js"></script>
+<script src = "js/persitence-sparse-demo.js"></script>
+<script src = "js/halfmunkres.js"></script>
+<script src = "js/index.js"></script>
 
 </body>
 </html>

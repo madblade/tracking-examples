@@ -97,8 +97,8 @@ function performDemo()
         pdData1, pdElementF1, size1 * elementSizeDiagram, size1 * elementSizeDiagram, 1, true);
     var dF = drawGrid(
         gridDataFull, gridElementF, size1 + size2, size1 + size2, elementSize, "full");
-    // var dFS = drawGrid(
-    //     gridDataFull, gridElementFS, size1 + size2, size1 + size2, elementSize, "full-sparse");
+    var dFS = drawGrid(
+        gridDataFull, gridElementFS, size1 + size2, size1 + size2, elementSize, "full-sparse");
 
     // selectorGeo.off('click');
     // selectorGeo.on('click', function(event) {

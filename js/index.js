@@ -50,7 +50,7 @@ slide
     .slide()
     .area({ axes: [1, 3], channels: 3, width: 10, height: pd.length, expr: emitCriticalPath })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
-    .slide().slide()
+    .slide()
     .area({ axes: [1, 3], channels: 3, width: 100, height: 100, expr: emitTracking })
     .line({color: '#000000', size: 20, opacity: 1, zIndex: 2 });
     //.vector({color: '#000000', size: 10, opacity: 1, zIndex: 2 });
@@ -64,16 +64,31 @@ let nbSlides = 15;
 $('#halfmunkres').hide();
 top.onkeydown = function(e) {
     switch (e.keyCode) {
-        case 81:
-            let a = present[0].get('index') + 1;
+        case 33: // page up
+        case 37: // left arrow
+        case 65: // a
+        case 81: // q
+            let a = present[0].get('index');
             //console.log(a);
-            if (a < 11) $('#halfmunkres').hide();
+            if (a < 14) $('#halfmunkres').hide();
             return present[0].set('index', Math.max(present[0].get('index') - 1, 0));
-        case 68:
+
+        case 34: // page down
+        case 39: // right arrow
+        case 68: // d
             let b = present[0].get('index') + 1;
             //console.log(b);
-            // if (b > 11) $('#halfmunkres').show();
+            if (b > 12) $('#halfmunkres').show();
             console.log("Next slide.");
             return present[0].set('index', Math.min(present[0].get('index') + 1, nbSlides));
     }
 };
+
+document
+    .getElementById('rightbutton')
+    .addEventListener('click',
+        () => top.onkeydown({keyCode: 39}), false);
+document
+    .getElementById('leftbutton')
+    .addEventListener('click',
+        () => top.onkeydown({keyCode: 37}), false);

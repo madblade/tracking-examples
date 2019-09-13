@@ -10,13 +10,13 @@ var mathbox = mathBox({
 if (mathbox.fallback) throw "WebGL not supported";
 var three = mathbox.three;
 three.renderer.setClearColor(new THREE.Color(256.0, 256.0, 256.0), 1.0);
-var camera = mathbox.camera({proxy: true, position: [0, 0, 10]});
+var camera = mathbox.camera({proxy: true, position: [0, 0, 15]});
 var view = mathbox.cartesian({range: [[-2, 2], [-2, 2], [-2, 2]], scale: [4, 4, 2]});
 mathbox.set('focus', 3);
 
 /** ############## MATH */
-var sizeX = 100;
-var sizeY = 50;
+var sizeX = 50;
+var sizeY = 25;
 //var sizeX = 40;
 //var sizeY = 20;
 
@@ -273,7 +273,6 @@ function computePersistenceDiagram(s1, s2, f)
                         // Completed current min-sad pair.
                         processedCritical.add(hash2);
                         // Not considering min-sad pairs!
-                        // TODO uncomment
                         persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]]]);
                         builtPair = true;
                     } else if (starterType === "sad"){
@@ -346,7 +345,7 @@ function computeD3PersistenceDiagram(sizeX, sizeY, pd, f)
     return pers;
 }
 
-var stretcher = 0.5;
+var stretcher = 1.0;
 
 function mainFunction(x, y) {
     let xx = x * stretcher;
