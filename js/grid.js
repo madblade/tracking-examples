@@ -1,6 +1,4 @@
 // var cPers = 0.5;
-var cGX = 0.5;
-var cGY = 0.5;
 
 function distagonal(pair)
 {
@@ -30,7 +28,7 @@ function distance(pair1, pair2)
 
     let whichEx1 = pair1.whichEx;
     let whichEx2 = pair2.whichEx;
-    if (whichEx1 !== whichEx2) {
+    if (whichEx1 === 0) {
         return 1000;
     }
 
@@ -45,8 +43,10 @@ function distance(pair1, pair2)
     let p2x = whichEx1 === 0 ? x12d2 : x22d2;
     let p2y = whichEx1 === 0 ? y12d2 : y22d2;
 
-    var cBirth = whichEx1 ? 0.5 : 0.0;
-    var cDeath = whichEx1 ? 0.0 : 0.5;
+    var cBirth = 0.0; //whichEx1 === 0 ? 0.5 : 0.0;
+    var cDeath = 0.0; //whichEx1 === 0 ? 0.0 : 0.5;
+    var cGX = 5.5;
+    var cGY = 0.5;
 
     return Math.sqrt(cBirth * Math.pow(x1 - x2, 2) + cDeath * Math.pow(y1 - y2, 2) +
             cGX * Math.pow(p1x - p2x, 2) + cGY * Math.pow(p1y - p2y, 2));

@@ -478,6 +478,7 @@ var emitTracking = function(emit, x, y, i, j, t) {
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
     let it = Math.floor(t1 * nbDiagBourrin);
     let n = it - 100 + i;
+    // debugger;
 
     // let factor = n % 2 === 0 ? 0 : 1;
     let factor = 0;
@@ -493,7 +494,7 @@ var emitTracking = function(emit, x, y, i, j, t) {
             T = TT[jj];
             if (T) break;
         }
-        if (!T) return emit(0,0,0);
+        if (!T) return emit(0, 0, 0);
     }
 
     var sextuplet = T[j];
@@ -505,7 +506,7 @@ var emitTracking = function(emit, x, y, i, j, t) {
             }
         }
         //emit(10, 10, 10);
-        if (!sextuplet) return emit(0,0,0);
+        if (!sextuplet) return emit(0, 0, 0);
     }
     let x0 = sextuplet[0];
     let y0 = sextuplet[1];
