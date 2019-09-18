@@ -1,6 +1,4 @@
 // var cPers = 0.5;
-var cBirth = 0.0;
-var cDeath = 0.0;
 var cGX = 0.5;
 var cGY = 0.5;
 
@@ -25,15 +23,30 @@ function distance(pair1, pair2)
     let x22d = pair1.x22d;
     let y12d = pair1.y12d;
     let y22d = pair1.y22d;
-    let p1x = (x12d + x22d) * 0.5;
-    let p1y = (y12d + y22d) * 0.5;
-
     let x12d2 = pair2.x12d;
     let x22d2 = pair2.x22d;
     let y12d2 = pair2.y12d;
     let y22d2 = pair2.y22d;
-    let p2x = (x12d2 + x22d2) * 0.5;
-    let p2y = (y12d2 + y22d2) * 0.5;
+
+    let whichEx1 = pair1.whichEx;
+    let whichEx2 = pair2.whichEx;
+    if (whichEx1 !== whichEx2) {
+        return 1000;
+    }
+
+    // let p1x = (x12d + x22d) * 0.5;
+    // let p1y = (y12d + y22d) * 0.5;
+    // let p2x = (x12d2 + x22d2) * 0.5;
+    // let p2y = (y12d2 + y22d2) * 0.5;
+
+    let p1x = whichEx1 === 0 ? x12d : x22d;
+    let p1y = whichEx1 === 0 ? y12d : y22d;
+
+    let p2x = whichEx1 === 0 ? x12d2 : x22d2;
+    let p2y = whichEx1 === 0 ? y12d2 : y22d2;
+
+    var cBirth = whichEx1 ? 0.5 : 0.0;
+    var cDeath = whichEx1 ? 0.0 : 0.5;
 
     return Math.sqrt(cBirth * Math.pow(x1 - x2, 2) + cDeath * Math.pow(y1 - y2, 2) +
             cGX * Math.pow(p1x - p2x, 2) + cGY * Math.pow(p1y - p2y, 2));

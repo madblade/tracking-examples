@@ -1,6 +1,6 @@
 $('#button').on('click', function(event) {
     event.preventDefault(); // To prevent following the link (optional)
-    performDemo();
+    // performDemo();
 });
 
 /** ############## PRESENTATION */

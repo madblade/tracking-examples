@@ -21,12 +21,20 @@
     <title>sparsity</title>
 </head>
 
-<button id="rightbutton">
-    <p><i class="arrow right"></i></p>
-</button>
-<button id="leftbutton">
-    <p><i class="arrow left"></i></p>
-</button>
+<div class="button-wrapper button-wrapper-left">
+    <div class="button-verticalizer">
+        <button id="leftbutton">
+            <p><i class="arrow left"></i></p>
+        </button>
+    </div>
+</div>
+<div class="button-wrapper button-wrapper-right">
+    <div class="button-verticalizer">
+        <button id="rightbutton">
+            <p><i class="arrow right"></i></p>
+        </button>
+    </div>
+</div>
 
 <body>
 
@@ -79,7 +87,6 @@
 <script src = "js/color.js"></script>
 <script src = "js/grid.js"></script>
 <script src = "js/persistencediag.js"></script>
-<script src = "js/sparse-demo.js"></script>
 <script src = "js/persitence-sparse-demo.js"></script>
 <script src = "js/halfmunkres.js"></script>
 <script src = "js/index.js"></script>

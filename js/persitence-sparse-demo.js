@@ -19,6 +19,7 @@ var sizeX = 50;
 var sizeY = 25;
 //var sizeX = 40;
 //var sizeY = 20;
+var elementSize = 5; // pixels
 
 function upperNeighbors(octoPoint, f)
 {
@@ -214,7 +215,7 @@ function computePersistenceDiagram(s1, s2, f)
                 nextStarterKit = [];
 
                 // Check if min has unprocessed neighbors.
-                let ns = upperNeighbors(currentElement, f);
+                let ns = upperNeighbors(currentElement, f, s1, s2);
                 if (ns.length > 0) {
                     for (let n = 0; n < ns.length; ++n) {
                         let cn = ns[n];
@@ -255,7 +256,7 @@ function computePersistenceDiagram(s1, s2, f)
                         // Completed the global min-max pair.
                         if (k === 0 && cn[0] === globalMax[0] && cn[1] === globalMax[1]) {
                             processedCritical.add(hash2);
-                            persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]]]);
+                            persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]], 1]);
                             builtPair = true;
                             console.log('Should only happen once: min matched max.');
                         } else {
@@ -265,7 +266,7 @@ function computePersistenceDiagram(s1, s2, f)
                     else if (starterType === "sad") {
                         // Completed current sad-max pair.
                         processedCritical.add(hash2);
-                        persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]]]);
+                        persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]], 1]);
                         builtPair = true;
                     }
                 } else if (ct === "sad") {
@@ -273,7 +274,7 @@ function computePersistenceDiagram(s1, s2, f)
                         // Completed current min-sad pair.
                         processedCritical.add(hash2);
                         // Not considering min-sad pairs!
-                        persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]]]);
+                        persistenceDiagram.push([[starter[0], starter[1]], [cn[0], cn[1]], 0]);
                         builtPair = true;
                     } else if (starterType === "sad"){
                         // console.log('I don\'t know if this should happen often. two saddles are linked.');
@@ -327,7 +328,21 @@ function computePersistenceDiagram(s1, s2, f)
         starters = nextRoundStarters;
     }
 
-    persistenceDiagram.unshift([[globalMin[0], globalMin[1]], [globalMax[0], globalMax[1]]]);
+    // Dirtily remove saddle-global assignments
+    for (let i = persistenceDiagram.length - 1; i >= 0; --i) {
+        let pp = persistenceDiagram[i];
+        let pp1 = pp[0];
+        let pp2 = pp[1];
+        if (pp1[0] === globalMin[0] && pp1[1] === globalMin[1] ||
+            pp2[0] === globalMin[0] && pp2[1] === globalMin[1] ||
+            pp1[0] === globalMax[0] && pp1[1] === globalMax[1] ||
+            pp2[0] === globalMax[0] && pp2[1] === globalMax[1])
+        {
+            persistenceDiagram.splice(i, 1);
+        }
+    }
+
+    persistenceDiagram.unshift([[globalMin[0], globalMin[1]], [globalMax[0], globalMax[1]], 1]);
     return [cps, persistenceDiagram];
 }
 

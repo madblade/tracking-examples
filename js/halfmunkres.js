@@ -12,6 +12,8 @@ for (let i = 0; i < bourrinpd.length; ++i)
     for (let j = 0; j < currentDiag.length; ++j) {
         let p1 = currentDiag[j][0];
         let p2 = currentDiag[j][1];
+        let whichEx = currentDiag[j][2];
+
         let x1 = p1[0] * 4 / sizeX - 2;
         let y1 = p1[1] * 4 / sizeY - 2;
         let x2 = p2[0] * 4 / sizeX - 2;
@@ -23,7 +25,7 @@ for (let i = 0; i < bourrinpd.length; ++i)
         }
         let xx = 0.8 * (Math.min(val1, val2) - min) / range;
         let yy = 0.8 * (Math.abs(val1 - val2) - min) / range;
-        data.push({x: xx, y: yy, i: j, x12d: x1, x22d: x2, y12d: y1, y22d: y2});
+        data.push({x: xx, y: yy, i: j, x12d: x1, x22d: x2, y12d: y1, y22d: y2, whichEx: whichEx});
     }
 
     allDiags.push(data);
@@ -55,7 +57,7 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
     //var d1HM = drawDiagram(pdData2, pdElementH2, size2 * elementSize, size2 * elementSize, 1, false, i);
     var d2HM = drawDiagram(pdData1, pdElementH1, size1 * elementSize, size1 * elementSize, 1, false, i);
     var gH = drawGrid(gridDataHalf, gridElementH, size2 + 1, size1 + 1, elementSize, "half", i);
-    console.log('OOPS BABY I DID IT AGAIN');
+    // console.log('OOPS BABY I DID IT AGAIN');
 
     reinitHalfMunkres(size1 + 1, size2 + 1, costMatrixHalf);
     while (!isHalfMunkresOver()) {
