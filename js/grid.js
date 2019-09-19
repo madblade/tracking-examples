@@ -1,5 +1,7 @@
 // var cPers = 0.5;
 
+import {getColor} from "./color";
+
 function distagonal(pair)
 {
     let x = pair.x;
@@ -266,3 +268,5 @@ function drawGrid(gridData, gridElement, size1, size2, elementSize, gridType, in
 
     return column;
 }
+
+export {getGrid, distagonal, distance, drawGrid};

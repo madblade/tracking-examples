@@ -1,20 +1,4 @@
-// Init libs
-var mathbox = mathBox({
-    plugins: ['core', 'controls', 'cursor', 'mathbox'],
-    controls: {
-        klass: THREE.OrbitControls // Orbit controls, i.e. Euler angles, with gimbal lock
-        //klass: THREE.TrackballControls // Trackball controls, i.e. Free quaternion rotation
-    }
-});
 
-if (mathbox.fallback) throw "WebGL not supported";
-var three = mathbox.three;
-three.renderer.setClearColor(new THREE.Color(256.0, 256.0, 256.0), 1.0);
-var camera = mathbox.camera({proxy: true, position: [0, 0, 15]});
-var view = mathbox.cartesian({range: [[-2, 2], [-2, 2], [-2, 2]], scale: [4, 4, 2]});
-mathbox.set('focus', 3);
-
-/** ############## MATH */
 var sizeX = 50;
 var sizeY = 25;
 //var sizeX = 40;
@@ -388,9 +372,9 @@ var emitSurfaceBlopTime = function (emit, x, y, i, j, t) {
     return emit(x, y, multisineT(t1, x, y));
 };
 
-let bourrinpd = [];
-let bourrincrit = [];
-let nbDiagBourrin = 100;
+var bourrinpd = [];
+var bourrincrit = [];
+var nbDiagBourrin = 100;
 for (let i = 0; i < nbDiagBourrin; ++i) {
     let t1 = 2 * Math.PI * i / nbDiagBourrin;
     let pdandcrit = computePersistenceDiagram(sizeX, sizeY, (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
@@ -463,82 +447,36 @@ var emitTrackingBis = function(emit, x, y, i, j) {
     return emit(newX, newY, newZ);
 };
 
-var emitTrackingFix = function(emit, x, y, i, j, t) {
-    let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
-    let maxSlice = Math.floor(t1 * (TTT.length - 1));
+var emitTrackingFix = function(TTT) {
+    return function(emit, x, y, i, j, t) {
+        let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
+        let maxSlice = Math.floor(t1 * (TTT.length - 1));
 
-    // let i2 = (i - (i % 2)) / 2;
-    let idSlice = 0;
-    let idSeg = 0;
-    let currentSlice = TTT[idSlice];
-    let currentSeg = currentSlice[idSeg];
-    let counter = 0;
-    while (counter < j) {
-        idSeg++;
-        if (idSeg >= currentSlice.length) {
-            idSeg = 0;
-            idSlice++;
-            if (idSlice >= maxSlice) {
-                idSlice = 0;
-                return emit(0, 0, 0);
+        // let i2 = (i - (i % 2)) / 2;
+        let idSlice = 0;
+        let idSeg = 0;
+        let currentSlice = TTT[idSlice];
+        let currentSeg = currentSlice[idSeg];
+        let counter = 0;
+        while (counter < j) {
+            idSeg++;
+            if (idSeg >= currentSlice.length) {
+                idSeg = 0;
+                idSlice++;
+                if (idSlice >= maxSlice) {
+                    idSlice = 0;
+                    return emit(0, 0, 0);
+                }
+                currentSlice = TTT[idSlice];
             }
-            currentSlice = TTT[idSlice];
+            currentSeg = currentSlice[idSeg];
+            counter++;
         }
-        currentSeg = currentSlice[idSeg];
-        counter++;
+
+        return i % 2 === 0 ?
+            emit(currentSeg[0], currentSeg[1], currentSeg[2]) :
+            emit(currentSeg[3], currentSeg[4], currentSeg[5]);
     }
-
-    return i % 2 === 0 ?
-        emit(currentSeg[0], currentSeg[1], currentSeg[2]) :
-        emit(currentSeg[3], currentSeg[4], currentSeg[5]);
-};
-
-var emitTracking = function(emit, x, y, i, j, t) {
-    let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
-    let it = Math.floor(t1 * nbDiagBourrin);
-    let n = it - 128 + i;
-    // debugger;
-
-    // let factor = n % 2 === 0 ? 0 : 1;
-    let factor = 0;
-    if (n < 1) {
-        n = 1;
-        //emit(10, 10, 10);
-        // return emit(0,0,0);
-    }
-    let T = TT[n];
-    if (!T) {
-        //return emit(10, 10, 10);
-        for (let jj = n; jj >= 0; --jj) {
-            T = TT[jj];
-            if (T) break;
-        }
-        if (!T) return emit(0, 0, 0);
-    }
-
-    var sextuplet = T[j];
-    if (!sextuplet) {
-        for (let jj = j; jj >= 0; --jj) {
-            let st = T[jj];
-            if (st) {
-                sextuplet = st;
-            }
-        }
-        //emit(10, 10, 10);
-        if (!sextuplet) return emit(0, 0, 0);
-    }
-    let x0 = sextuplet[0];
-    let y0 = sextuplet[1];
-    let z0 = sextuplet[2];
-    let x1 = sextuplet[3];
-    let y1 = sextuplet[4];
-    let z1 = sextuplet[5];
-
-    var newX, newY, newZ;
-    newX = x0 + (factor) * (x1 - x0);
-    newY = y0 + (factor) * (y1 - y0);
-    newZ = z0 + (factor) * (z1 - z0); // multisineT(t, newX, newY);
-    return emit(newX, newY, newZ);
 };
 
 var emitCriticalPath = function(emit, x, y, i, j, t) {
@@ -610,7 +548,7 @@ for (let i = 0; i < cps.length; ++i) {
     if (ccc[2] === 'min') dataCritMin.push([x1, y1, multisine(x1, y1)]);
 }
 
-pathMinToMax = function(emit, x, y, i, j, t) {
+var pathMinToMax = function(emit, x, y, i, j, t) {
     var p1, p2;
     var newX, newY, newZ;
     p1 = d1[j];
@@ -622,3 +560,8 @@ pathMinToMax = function(emit, x, y, i, j, t) {
     newZ = multisine(newX, newY);
     return emit(newX, newY, newZ);
 };
+
+export {bourrinpd, nbDiagBourrin, multisineT, sizeX, sizeY, elementSize, pathMinToMax, emitCriticalMax,
+emitCriticalMin, emitCriticalPath, emitCriticalPoints, emitCriticalSad, emitSurfaceBlop,
+emitSurfaceBlopTime, emitTrackingFix,
+    dataCritMin, dataAllCrit, dataCritMax, dataCritSad, pd};

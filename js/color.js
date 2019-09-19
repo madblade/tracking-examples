@@ -49,6 +49,15 @@ var rgb2hsl = function(color) {
     return [h, s, l];
 };
 
+function hue2rgb(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+}
+
 var hsl2rgb = function(color) {
     var l = color[2];
 
@@ -56,14 +65,6 @@ var hsl2rgb = function(color) {
         l = Math.round(l*255);
         return [l, l, l];
     } else {
-        function hue2rgb(p, q, t) {
-            if (t < 0) t += 1;
-            if (t > 1) t -= 1;
-            if (t < 1/6) return p + (q - p) * 6 * t;
-            if (t < 1/2) return q;
-            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-            return p;
-        }
 
         var s = color[1];
         var q = (l < 0.5 ? l * (1 + s) : l + s - l * s);
@@ -122,3 +123,5 @@ function getColor(val)
         _interpolateColor(intervalle1, intervalle2, facteur);
     return r2h(interp);
 }
+
+export {getColor};

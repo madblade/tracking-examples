@@ -1,3 +1,50 @@
+import '../css/style.css';
+// import '../cdn/bootstrap.min.css';
+// import '../cdn/bootstrap-theme.min.css';
+import '../cdn/mathbox.css';
+import './mathbox-bundle.min';
+import './color';
+import './grid';
+import './persistencediag';
+import './persitence-sparse-demo';
+import './halfmunkres';
+import { TTT } from './halfmunkres';
+import {
+    dataCritMax,
+    dataCritMin,
+    dataCritSad, emitCriticalMax, emitCriticalMin, emitCriticalPath, emitCriticalSad,
+    emitSurfaceBlop, emitSurfaceBlopTime, emitTrackingFix,
+    pathMinToMax, pd,
+    sizeX,
+    sizeY
+} from './persitence-sparse-demo';
+import OrbitControls from "./OrbitControls";
+import {Color, WebGLRenderer} from 'three';
+
+// Init libs
+var mathbox = mathBox({
+    plugins: ['core', 'controls', 'cursor', 'mathbox'],
+    controls: {
+        klass: OrbitControls // Orbit controls, i.e. Euler angles, with gimbal lock
+        //klass: THREE.TrackballControls // Trackball controls, i.e. Free quaternion rotation
+    }
+});
+
+if (mathbox.fallback) throw "WebGL not supported";
+var three = mathbox.three;
+var newRenderer = new WebGLRenderer({antialias: true});
+three.renderer.setClearColor(new Color( 0xffff00 ), 1.0);
+newRenderer.setClearColor(new Color( 0xffff00 ), 1.0);
+// setInterval(function() {three.renderer.setClearColor(new Color( 0xffffff ), 1.0);},
+//     16);
+console.log(three);
+console.log(mathbox);
+
+console.log(three.renderer);
+var camera = mathbox.camera({proxy: true, position: [0, 0, 15]});
+var view = mathbox.cartesian({range: [[-2, 2], [-2, 2], [-2, 2]], scale: [4, 4, 2]});
+mathbox.set('focus', 3);
+
 var present = mathbox.present({index: 0});
 var slide = present.clock().slide({id: 'top'});
 
@@ -44,7 +91,7 @@ slide
     .area({ axes: [1, 3], channels: 3, width: 20, height: pd.length, expr: emitCriticalPath })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
     .slide()
-    .area({ axes: [1, 3], channels: 3, width: 2, height: 1024, expr: emitTrackingFix })
+    .area({ axes: [1, 3], channels: 3, width: 2, height: 1024, expr: emitTrackingFix(TTT) })
     .line({color: '#ff0000', size: 20, opacity: 1, zIndex: 2})
     .slide()
     // .area({ axes: [1, 3], channels: 3, width: 128, height: 128, expr: emitTracking })

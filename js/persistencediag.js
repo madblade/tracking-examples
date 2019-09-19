@@ -1,3 +1,5 @@
+import {getColor} from "./color";
+
 function drawDiagram(pdData, pdElement, width, height, offset, pullRight, index)
 {
     var diagSize = pdData.length;
@@ -58,3 +60,5 @@ function drawDiagram(pdData, pdElement, width, height, offset, pullRight, index)
 
     return [bars, diag, min, max];
 }
+
+export {drawDiagram};

@@ -1,3 +1,8 @@
+import {bourrinpd, nbDiagBourrin, multisineT, sizeY, sizeX, elementSize}
+    from "./persitence-sparse-demo";
+import {drawGrid, getGrid} from "./grid";
+import {drawDiagram} from "./persistencediag";
+
 // Convert diagrams.
 var allDiags = [];
 for (let i = 0; i < bourrinpd.length; ++i)
@@ -204,7 +209,7 @@ for (let i = 0; i < TT.length; ++i) {
         }
     }
 }
-console.log(TT);
+// console.log(TT);
 
 var halfMunkresRunningInterval;
 function launchHalfMunkres(
@@ -933,3 +938,5 @@ function stepSeven(step) {
     console.log("[HalfMunkres] " + iter + " iterations.");
     return step;
 }
+
+export {TTT, TT};
