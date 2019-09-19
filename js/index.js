@@ -1,10 +1,3 @@
-$('#button').on('click', function(event) {
-    event.preventDefault(); // To prevent following the link (optional)
-    // performDemo();
-});
-
-/** ############## PRESENTATION */
-
 var present = mathbox.present({index: 0});
 var slide = present.clock().slide({id: 'top'});
 
@@ -32,7 +25,7 @@ slide
     .array({ id: 'sampler4', length: dataCritSad.length, data: dataCritSad, items: 3, channels: 3 })
     .point({ color: '#ffffff', size: 20, zIndex: 2})
     .slide()
-    .area({ axes: [1, 3], channels: 3, width: 10, height: pd.length, expr: pathMinToMax })
+    .area({ axes: [1, 3], channels: 3, width: 20, height: pd.length, expr: pathMinToMax })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
     .end().end().end().end().end()
     .slide()
@@ -48,10 +41,10 @@ slide
     .array({ id: 'sampler7', length: 100, expr: emitCriticalSad, items: 3, channels: 3 })
     .point({ color: '#fffbfe', size: 20, zIndex: 2})
     .slide()
-    .area({ axes: [1, 3], channels: 3, width: 10, height: pd.length, expr: emitCriticalPath })
+    .area({ axes: [1, 3], channels: 3, width: 20, height: pd.length, expr: emitCriticalPath })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
     .slide()
-    .area({ axes: [1, 3], channels: 3, width: 100, height: 100, expr: emitTracking })
+    .area({ axes: [1, 3], channels: 3, width: 128, height: 128, expr: emitTracking })
     .line({color: '#000000', size: 20, opacity: 1, zIndex: 2 });
     //.vector({color: '#000000', size: 10, opacity: 1, zIndex: 2 });
     //.ticks({color: '#000000', opacity: 1, zIndex: 2 });

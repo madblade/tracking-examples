@@ -81,9 +81,7 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
                 let x11 = pair1[1][0];
                 let y11 = pair1[1][1];
                 let type1 = pair1[2] === 0 ? 'min' : 'sad';
-                    // getCriticalType(sizeX, sizeY, x10, y10, (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
                 let type2 = pair1[2] === 0 ? 'sad' : 'min';
-                    // getCriticalType(sizeX, sizeY, x11, y11, (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
                 let x1, y1;
                 if (type1 === 'max' && type2 === 'min') {
                     x1 = x10*4/sizeX-2;
@@ -107,9 +105,7 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
                 let y21 = pair2[1][1];
                 let x2, y2;
                 let type10 = pair2[2] === 0 ? 'min' : 'sad';
-                    // getCriticalType(sizeX, sizeY, x20, y20, (x, y) => multisineT(t2, x*4/sizeX-2, y*4/sizeY-2));
                 let type20 = pair2[2] === 0 ? 'sad' : 'min';
-                    // getCriticalType(sizeX, sizeY, x21, y21, (x, y) => multisineT(t2, x*4/sizeX-2, y*4/sizeY-2));
                 if (type10 === 'max' && type20 === 'min') {
                     x2 = x20*4/sizeX-2;
                     y2 = y20*4/sizeY-2;
@@ -127,7 +123,6 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
                 let v2 = multisineT(t2, x2, y2);
                 let dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
                 if (dist < 0.1) {
-                    //console.log(x1+','+x2);
                     seg.push([x1, y1, v1, x2, y2, v2]);
                 }
             }
@@ -210,7 +205,7 @@ for (let i = 0; i < TT.length; ++i) {
         }
     }
 }
-console.log(TT);
+// console.log(TT);
 
 var halfMunkresRunningInterval;
 function launchHalfMunkres(

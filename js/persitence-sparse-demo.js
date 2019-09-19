@@ -41,63 +41,6 @@ function upperNeighbors(octoPoint, f)
     return neighbors;
 }
 
-function getCriticalType(s1, s2, i, j, f)
-{
-    // Compute critical points
-    let currentValue = f(i, j);
-    let nBools = [
-        f(i + 1, j)     > currentValue || (f(i + 1, j)     === currentValue && (i+1) * s1 + j < i * s1 + j) ,
-        f(i + 1, j + 1) > currentValue || (f(i + 1, j + 1) === currentValue && (i+1) * s1 + j+1 < i * s1 + j) ,
-        f(i, j + 1)     > currentValue || (f(i, j + 1)     === currentValue && (i) * s1 + j+1 < i * s1 + j) ,
-        f(i - 1, j)     > currentValue || (f(i - 1, j)     === currentValue && (i-1) * s1 + j < i * s1 + j) ,
-        f(i - 1, j - 1) > currentValue || (f(i - 1, j - 1) === currentValue && (i-1) * s1 + j-1 < i * s1 + j) ,
-        f(i, j - 1)     > currentValue || (f(i, j - 1)     === currentValue && (i) * s1 + j-1 < i * s1 + j) ,
-    ];
-    let nbPlus = 0;
-    let nbMinus = 0;
-    let currentPlus = false;
-    let currentMinus = false;
-    let nbComponentPlus = 0;
-    let nbComponentMinus = 0;
-    for (let k = 0; k < nBools.length; ++k) {
-        if (nBools[k]) {
-            nbPlus++;
-            if (!currentPlus) nbComponentPlus++;
-            currentPlus = true;
-            if (currentMinus) currentMinus = false;
-        } else {
-            nbMinus++;
-            if (!currentMinus) nbComponentMinus++;
-            currentMinus = true;
-            if (currentPlus) currentPlus = false;
-        }
-    }
-    // Don't forget to test modulo k!
-    if (nBools[0]) {
-        if (currentPlus && nbComponentMinus > 0) nbComponentPlus--;
-    } else {
-        if (currentMinus && nbComponentPlus > 0) nbComponentMinus--;
-    }
-
-    let type = "reg";
-    if (nbComponentPlus === 0 && nbComponentMinus > 0) {
-        type = "max";
-    }
-    if (nbComponentPlus > 0 && nbComponentMinus === 0) {
-        type = "min";
-    }
-    if (nbComponentPlus + nbComponentMinus > 2) {
-        type = "sad";
-    }
-    if (nbComponentMinus === 0 && nbComponentPlus === 0)
-        console.log('No neighbors?');
-    if (nbComponentMinus + nbComponentPlus > 4) {
-        type = "mul";
-    }
-
-    return type;
-}
-
 function computePersistenceDiagram(s1, s2, f)
 {
     var cps = [];
@@ -106,8 +49,8 @@ function computePersistenceDiagram(s1, s2, f)
     let criticalPoints = [];
 
     // Compute critical points
-    for (let i = 0; i < s1; ++i) {
-        for (let j = 0; j < s2; ++j) {
+    for (let i = 1; i < s1; ++i) {
+        for (let j = 1; j < s2; ++j) {
             let currentValue = f(i, j);
             let nBools = [
                 f(i + 1, j)     > currentValue || (f(i + 1, j)     === currentValue && (i+1) * s1 + j < i * s1 + j) ,
@@ -188,6 +131,7 @@ function computePersistenceDiagram(s1, s2, f)
     criticalPointsId++;
     let nbMaxNotAssigned = 0;
     let globalMax = criticalPoints[criticalPoints.length - 1];
+    let unassignedMaxs = [];
     while (starters.size > 0)
     {
         let lowestRoundValue = Number.MAX_VALUE;
@@ -311,8 +255,10 @@ function computePersistenceDiagram(s1, s2, f)
                 let ct = pointType[c[0]][c[1]];
                 if (ct === 'max') {
                     nbMaxNotAssigned++;
-                    if (nbMaxNotAssigned > 1)
-                    console.log('A max was not assigned, this should only happen on the border.');
+                    unassignedMaxs.push(c);
+                    if (nbMaxNotAssigned > 1) {
+                        console.log('A max was not assigned, this should only happen on the border.');
+                    }
                 }
                 else if (ct === 'min' || ct === 'sad')
                 {
@@ -342,6 +288,54 @@ function computePersistenceDiagram(s1, s2, f)
         }
     }
 
+    // This is not the actual persistence diagram
+    // (nor the proper way to compute it).
+    // Actually this code is old and I have neither the time
+    // nor the required motivation to investigate the bug that
+    // sometimes isolates a local maximum.
+    if (nbMaxNotAssigned > 1 && unassignedMaxs.length > 1) {
+        let unassignedMax =
+            unassignedMaxs[0][0] === globalMax[0] && unassignedMaxs[0][1] === globalMax[1] ?
+                unassignedMaxs[1] : unassignedMaxs[0];
+
+        // Find an unassigned saddle (on the border preferably)
+        let unassignedSad = null;
+        for (let i = 0; i < cps.length; ++i) {
+            let current = cps[i];
+            if (current[2] !== 'sad') continue;
+            let currentX = current[0];
+            let currentY = current[1];
+            let foundInDiag = false;
+            for (let j = 0; j < persistenceDiagram.length; ++j) {
+                let cpp = persistenceDiagram[j];
+                if (currentX === cpp[0][0] && currentY === cpp[0][1] ||
+                    currentX === cpp[1][0] && currentY === cpp[1][1])
+                {
+                    foundInDiag = true;
+                    break;
+                }
+            }
+            if (foundInDiag) continue;
+            // if (currentX !== 0 && currentY !== 0) continue;
+            unassignedSad = current;
+            break;
+        }
+
+        if (!!unassignedSad) {
+            persistenceDiagram.push([
+                [unassignedSad[0], unassignedSad[1]], [unassignedMax[0], unassignedMax[1]],
+                1
+            ]);
+        } else {
+            console.log('I could not fix the dangling max by searching a lone saddle. ');
+
+            console.log(unassignedMax);
+            console.log(cps);
+            console.log(persistenceDiagram);
+            console.log('Fixing a bad choke');
+        }
+    }
+
     persistenceDiagram.unshift([[globalMin[0], globalMin[1]], [globalMax[0], globalMax[1]], 1]);
     return [cps, persistenceDiagram];
 }
@@ -361,31 +355,25 @@ function computeD3PersistenceDiagram(sizeX, sizeY, pd, f)
 }
 
 var stretcher = 1.0;
-
-function mainFunction(x, y) {
-    let xx = x * stretcher;
-    let yy = y * stretcher;
-    return 0.5 + (1 / stretcher) * (π / 2
-        + .6 * Math.sin(xx - yy + 2 * Math.sin(yy))
-        + .3 * Math.sin(xx * 2 + yy * 2 * 1.81)
-        + .1825 * Math.sin(xx * 3 - yy * 2 * 2.18)) - .5;
-}
+var PI = Math.PI;
 
 // My function:
 // 1.570796 + .6 * sin(x - y + 2 * sin(y)) + .3 * sin(x * 2 + y * 2 * 1.81) + .1825 * sin(x * 3 - y * 2 * 2.18)) -.5
 function multisine(x, y) {
+    let t = Math.PI * 0.9;
+
     let xx = x * stretcher;
     let yy = y * stretcher;
-    return 0.5 + (1 / stretcher) * (π / 2
-        + .6 *    Math.sin(xx - yy + 2 * Math.sin(yy))
-        + .3 *    Math.sin(xx * 2 + yy * 2 * 1.81)
-        + .1825 * Math.sin(xx * 3 - yy * 2 * 2.18)) - .5
+    return 0.5 + (1 / stretcher) * (PI / 2
+        + .6 *    Math.sin(xx + t - yy + 2 * Math.sin(yy))
+        + .3 *    Math.sin(xx * 2 + t + yy * 2 * 1.81)
+        + .1825 * Math.sin(xx * 3 + t - yy * 2 * 2.18)) - .5
 }
 
 function multisineT(t, x, y) {
     let xx = x * stretcher;
     let yy = y * stretcher;
-    return 0.5 + (1 / stretcher) * (π / 2
+    return 0.5 + (1 / stretcher) * (PI / 2
         + .6 * Math.sin(xx + t - yy + 2 * Math.sin(yy))
         + .3 * Math.sin(xx * 2 + t + yy * 2 * 1.81)
         + .1825 * Math.sin(xx * 3 + t - yy * 2 * 2.18)) - .5;
@@ -477,7 +465,7 @@ var emitTrackingBis = function(emit, x, y, i, j) {
 var emitTracking = function(emit, x, y, i, j, t) {
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
     let it = Math.floor(t1 * nbDiagBourrin);
-    let n = it - 100 + i;
+    let n = it - 128 + i;
     // debugger;
 
     // let factor = n % 2 === 0 ? 0 : 1;
@@ -536,8 +524,8 @@ var emitCriticalPath = function(emit, x, y, i, j, t) {
     p2 = bbc[1];
 
     // Draw a line between them...
-    newX = p1[0] + (i/9) * (p2[0] - p1[0]);
-    newY = p1[1] + (i/9) * (p2[1] - p1[1]);
+    newX = p1[0] + (i/19) * (p2[0] - p1[0]);
+    newY = p1[1] + (i/19) * (p2[1] - p1[1]);
 
     newX = newX*4/sizeX-2;
     newY = newY*4/sizeY-2;
@@ -545,9 +533,16 @@ var emitCriticalPath = function(emit, x, y, i, j, t) {
     return emit(newX, newY, newZ);
 };
 
+console.log('WAIT FOR IT');
+console.log('WAIT FOR IT');
+console.log('WAIT FOR IT');
 let critAndPd = computePersistenceDiagram(sizeX, sizeY, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
 let cps = critAndPd[0];
 let pd = critAndPd[1];
+console.log('I COMPUTED THE PERSISTENCE DIAGRAM');
+console.log('I COMPUTED THE PERSISTENCE DIAGRAM');
+console.log('I COMPUTED THE PERSISTENCE DIAGRAM');
+console.log(pd);
 let d3pd = computeD3PersistenceDiagram(sizeX, sizeY, pd, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
 // console.log(d3pd);
 
@@ -598,8 +593,8 @@ pathMinToMax = function(emit, x, y, i, j, t) {
     p2 = d2[j];
 
     // Draw a line between them...
-    newX = p1[0] + (i/9) * (p2[0] - p1[0]);
-    newY = p1[1] + (i/9) * (p2[1] - p1[1]);
-    newZ = mainFunction(newX, newY);
+    newX = p1[0] + (i/19) * (p2[0] - p1[0]);
+    newY = p1[1] + (i/19) * (p2[1] - p1[1]);
+    newZ = multisine(newX, newY);
     return emit(newX, newY, newZ);
 };
