@@ -73,7 +73,7 @@ for (let i = 0; i < allPDsInOneArray.length - 2; ++i)
         1, false, i);
     drawGrid(gridDataHalf, gridElementH,
         size2 + 1, size1 + 1,
-        elementSize, "half", i);
+        elementSize, "half", i, maxHalf);
 
     reinitHalfMunkres(size1 + 1, size2 + 1, costMatrixHalf);
     while (!isHalfMunkresOver()) {

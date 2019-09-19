@@ -1,4 +1,5 @@
 import { getColor } from "./color";
+import * as d3 from "d3";
 
 function distagonal(pair)
 {
@@ -49,9 +50,9 @@ function distance(pair1, pair2)
     let p2y = whichEx1 === 0 ? y12d2 : y22d2;
 
     var cBirth = 0.0; // whichEx1 === 0 ? 0.5 : 0.0;
-    var cDeath = 1.0; // whichEx1 === 0 ? 0.0 : 0.5;
-    var cGX = 10.0;
-    var cGY = 1.0;
+    var cDeath = 0.0; // whichEx1 === 0 ? 0.0 : 0.5;
+    var cGX = 0.5;
+    var cGY = 0.5;
 
     return Math.sqrt(cBirth * Math.pow(x1 - x2, 2) + cDeath * Math.pow(y1 - y2, 2) +
             cGX * Math.pow(p1x - p2x, 2) + cGY * Math.pow(p1y - p2y, 2));
@@ -67,7 +68,7 @@ function getGrid(
     gridType) // "half" or "full"
 {
     let data = [];
-    let xpos = 1; //starting xpos and ypos at 1 so the stroke will show when we make the grid below
+    let xpos = 1; // starting xpos and ypos at 1 so the stroke will show when we make the grid below
     let ypos = 1;
     let click = 0;
     let max = 0;
@@ -217,7 +218,9 @@ function getGrid(
     return [data, max];
 }
 
-function drawGrid(gridData, gridElement, size1, size2, elementSize, gridType, index)
+function drawGrid(
+    gridData, gridElement, size1, size2,
+    elementSize, gridType, index, maxValue)
 {
     let s1 = size1;
     let s2 =
@@ -261,7 +264,7 @@ function drawGrid(gridData, gridElement, size1, size2, elementSize, gridType, in
         .attr("style", function(d) {
             if (d.lastcol)
                 return "display:none";
-            return "fill: " + getColor(Math.min(Math.max(0, d.cost), 1)) + ";";
+            return "fill: " + getColor(d.cost < 0.5 ? d.cost * 1000 : 1) + ";";
         });
 
     return column;

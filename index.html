@@ -2,21 +2,6 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <!--<link rel="stylesheet" href="css/style.css"/>-->
-    <!-- Latest compiled and minified CSS -->
-    <!--<link rel="stylesheet" href="cdn/bootstrap.min.css">-->
-    <link rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-      integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-      crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <!--<link rel="stylesheet" href="cdn/bootstrap-theme.min.css">-->
-    <link rel="stylesheet"
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-      integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-      crossorigin="anonymous">
-    <!--<link rel="stylesheet" href="cdn/mathbox.css">-->
     <meta name="viewport" content="initial-scale=1, maximum-scale=1">
     <title>sparsity</title>
 </head>
@@ -38,39 +23,6 @@
 
 <body>
 
-<!-- Latest compiled and minified JavaScript -->
-<script
-        src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-<script
-        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.11.0/d3.js"></script>
-<script>
-    var jqueryEnabled = typeof jQuery === 'function';
-    if (!jqueryEnabled)
-    {
-        console.log('Failed to load jquery, fallback to local version.');
-        document.write('<script src="js/jquery-3.3.1.min.js">\x3C/script>');
-    }
-</script>
-<script>
-    var bootstrapEnabled = (typeof $().emulateTransitionEnd === 'function');
-    if (!bootstrapEnabled)
-    {
-        console.log('Failed to load bootstrap, fallback to local version.');
-        document.write('<script src="js/bootstrap.min.js">\x3C/script>');
-    }
-    var d3Enabled = typeof d3 === 'object';
-    if (!d3Enabled)
-    {
-        console.log('Failed to load d3, fallback to local version.');
-        document.write('<script src="js/d3.js">\x3C/script>');
-    }
-</script>
-
 <div class="container col-sm-12 panel panel-default" id="halfmunkres"
      style="display:none">
     <div class="row text-center panel panel-default">
@@ -82,14 +34,6 @@
     </div>
     <div id="grid"></div>
 </div>
-
-<!--<script src = "js/mathbox-bundle.min.js"></script>-->
-<!--<script src = "js/color.js"></script>-->
-<!--<script src = "js/grid.js"></script>-->
-<!--<script src = "js/persistencediag.js"></script>-->
-<!--<script src = "js/persitence-sparse-demo.js"></script>-->
-<!--<script src = "js/halfmunkres.js"></script>-->
-<!--<script src = "js/index.js"></script>-->
 
 </body>
 </html>

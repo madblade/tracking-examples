@@ -18,6 +18,7 @@ import {
 } from './persitence-sparse-demo';
 import OrbitControls from "./OrbitControls";
 import { Color } from 'three';
+import * as jquery from "jquery";
 
 // Init libs
 var mathbox = mathBox({
@@ -87,7 +88,7 @@ slide
 
 let nbSlides = 15;
 
-$('#halfmunkres').hide();
+jquery('#halfmunkres').hide();
 top.onkeydown = function(e) {
     switch (e.keyCode) {
         case 33: // page up
@@ -95,14 +96,18 @@ top.onkeydown = function(e) {
         case 65: // a
         case 81: // q
             let a = present[0].get('index');
-            if (a < 14) $('#halfmunkres').hide();
+            if (a < 14) {
+                jquery('#halfmunkres').hide();
+            }
             return present[0].set('index', Math.max(present[0].get('index') - 1, 0));
 
         case 34: // page down
         case 39: // right arrow
         case 68: // d
             let b = present[0].get('index') + 1;
-            if (b > 12) $('#halfmunkres').show();
+            if (b > 12) {
+                jquery('#halfmunkres').show();
+            }
             console.log("Next slide.");
             return present[0].set('index', Math.min(present[0].get('index') + 1, nbSlides));
     }

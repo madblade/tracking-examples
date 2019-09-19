@@ -1,4 +1,5 @@
 import {getColor} from "./color";
+import * as d3 from "d3";
 
 function drawDiagram(pdData, pdElement, width, height, offset, pullRight, index)
 {
