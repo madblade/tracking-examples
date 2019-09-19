@@ -3,9 +3,6 @@ import {getColor} from "./color";
 function drawDiagram(pdData, pdElement, width, height, offset, pullRight, index)
 {
     var diagSize = pdData.length;
-    // var width = 500;
-    // var height = 500;
-    // var offset = 1;
 
     if (index === 0)
     d3.select(pdElement + "id").remove();
@@ -61,4 +58,4 @@ function drawDiagram(pdData, pdElement, width, height, offset, pullRight, index)
     return [bars, diag, min, max];
 }
 
-export {drawDiagram};
+export { drawDiagram };

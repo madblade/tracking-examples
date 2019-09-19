@@ -1,6 +1,4 @@
-// var cPers = 0.5;
-
-import {getColor} from "./color";
+import { getColor } from "./color";
 
 function distagonal(pair)
 {
@@ -50,8 +48,8 @@ function distance(pair1, pair2)
     let p2x = whichEx1 === 0 ? x12d2 : x22d2;
     let p2y = whichEx1 === 0 ? y12d2 : y22d2;
 
-    var cBirth = 0.0; //whichEx1 === 0 ? 0.5 : 0.0;
-    var cDeath = 1.0; //whichEx1 === 0 ? 0.0 : 0.5;
+    var cBirth = 0.0; // whichEx1 === 0 ? 0.5 : 0.0;
+    var cDeath = 1.0; // whichEx1 === 0 ? 0.0 : 0.5;
     var cGX = 10.0;
     var cGY = 1.0;
 
@@ -263,10 +261,10 @@ function drawGrid(gridData, gridElement, size1, size2, elementSize, gridType, in
         .attr("style", function(d) {
             if (d.lastcol)
                 return "display:none";
-            return "fill: " + getColor(d.cost) + ";";
+            return "fill: " + getColor(Math.min(Math.max(0, d.cost), 1)) + ";";
         });
 
     return column;
 }
 
-export {getGrid, distagonal, distance, drawGrid};
+export { getGrid, distagonal, distance, drawGrid };

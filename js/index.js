@@ -1,6 +1,4 @@
 import '../css/style.css';
-// import '../cdn/bootstrap.min.css';
-// import '../cdn/bootstrap-theme.min.css';
 import '../cdn/mathbox.css';
 import './mathbox-bundle.min';
 import './color';
@@ -19,30 +17,22 @@ import {
     sizeY
 } from './persitence-sparse-demo';
 import OrbitControls from "./OrbitControls";
-import {Color, WebGLRenderer} from 'three';
+import { Color } from 'three';
 
 // Init libs
 var mathbox = mathBox({
     plugins: ['core', 'controls', 'cursor', 'mathbox'],
     controls: {
-        klass: OrbitControls // Orbit controls, i.e. Euler angles, with gimbal lock
-        //klass: THREE.TrackballControls // Trackball controls, i.e. Free quaternion rotation
+        klass: OrbitControls
     }
 });
 
 if (mathbox.fallback) throw "WebGL not supported";
 var three = mathbox.three;
-var newRenderer = new WebGLRenderer({antialias: true});
 three.renderer.setClearColor(new Color( 0xffff00 ), 1.0);
-newRenderer.setClearColor(new Color( 0xffff00 ), 1.0);
-// setInterval(function() {three.renderer.setClearColor(new Color( 0xffffff ), 1.0);},
-//     16);
-console.log(three);
-console.log(mathbox);
 
-console.log(three.renderer);
-var camera = mathbox.camera({proxy: true, position: [0, 0, 15]});
-var view = mathbox.cartesian({range: [[-2, 2], [-2, 2], [-2, 2]], scale: [4, 4, 2]});
+mathbox.camera({proxy: true, position: [0, 0, 15]});
+mathbox.cartesian({range: [[-2, 2], [-2, 2], [-2, 2]], scale: [4, 4, 2]});
 mathbox.set('focus', 3);
 
 var present = mathbox.present({index: 0});
@@ -93,17 +83,9 @@ slide
     .slide()
     .area({ axes: [1, 3], channels: 3, width: 2, height: 1024, expr: emitTrackingFix(TTT) })
     .line({color: '#ff0000', size: 20, opacity: 1, zIndex: 2})
-    .slide()
-    // .area({ axes: [1, 3], channels: 3, width: 128, height: 128, expr: emitTracking })
-    // .line({color: '#000000', size: 20, opacity: 1, zIndex: 2 })
-    ;
-    //.vector({color: '#000000', size: 10, opacity: 1, zIndex: 2 });
-    //.ticks({color: '#000000', opacity: 1, zIndex: 2 });
-
-// color: '#B8860B',
+    .slide();
 
 let nbSlides = 15;
-// $(window).keydown(function(e) {});
 
 $('#halfmunkres').hide();
 top.onkeydown = function(e) {
@@ -113,7 +95,6 @@ top.onkeydown = function(e) {
         case 65: // a
         case 81: // q
             let a = present[0].get('index');
-            //console.log(a);
             if (a < 14) $('#halfmunkres').hide();
             return present[0].set('index', Math.max(present[0].get('index') - 1, 0));
 
@@ -121,7 +102,6 @@ top.onkeydown = function(e) {
         case 39: // right arrow
         case 68: // d
             let b = present[0].get('index') + 1;
-            //console.log(b);
             if (b > 12) $('#halfmunkres').show();
             console.log("Next slide.");
             return present[0].set('index', Math.min(present[0].get('index') + 1, nbSlides));

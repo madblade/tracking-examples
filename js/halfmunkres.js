@@ -1,18 +1,24 @@
-import {bourrinpd, nbDiagBourrin, multisineT, sizeY, sizeX, elementSize}
-    from "./persitence-sparse-demo";
-import {drawGrid, getGrid} from "./grid";
-import {drawDiagram} from "./persistencediag";
+import {
+    allPDsInOneArray,
+    nbTotalPDs,
+    multisineT,
+    sizeY,
+    sizeX,
+    elementSize
+} from './persitence-sparse-demo';
+import { drawGrid, getGrid } from './grid';
+import { drawDiagram } from './persistencediag';
 
 // Convert diagrams.
 var allDiags = [];
-for (let i = 0; i < bourrinpd.length; ++i)
+for (let i = 0; i < allPDsInOneArray.length; ++i)
 {
-    let min = 0; // pi / 2 - .5;
+    let min = 0;
     let max = Math.PI / 2 + .6 + .3 + .1825 - .5;
     let range = (max - min);
 
-    let t1 = 2 * Math.PI * i / nbDiagBourrin;
-    let currentDiag = bourrinpd[i];
+    let t1 = 2 * Math.PI * i / nbTotalPDs;
+    let currentDiag = allPDsInOneArray[i];
     let data = [];
     for (let j = 0; j < currentDiag.length; ++j) {
         let p1 = currentDiag[j][0];
@@ -38,7 +44,10 @@ for (let i = 0; i < bourrinpd.length; ++i)
 
 let TTT = [];
 let TT = [];
-for (let i = 0; i < bourrinpd.length - 2; ++i) {
+for (let i = 0; i < allPDsInOneArray.length - 2; ++i)
+{
+    if (i % 20 === 0) console.log('[Munkres] Solving assignments ' + i + '%...');
+
     let pdData1 = allDiags[i];
     let pdData2 = allDiags[i+1];
     let size1 = pdData1.length;
@@ -57,11 +66,14 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
     }
 
     var pdElementH1 = "#pd1";
-    var pdElementH2 = "#pd2";
     var gridElementH = "#grid";
-    //var d1HM = drawDiagram(pdData2, pdElementH2, size2 * elementSize, size2 * elementSize, 1, false, i);
-    var d2HM = drawDiagram(pdData1, pdElementH1, size1 * elementSize, size1 * elementSize, 1, false, i);
-    var gH = drawGrid(gridDataHalf, gridElementH, size2 + 1, size1 + 1, elementSize, "half", i);
+    drawDiagram(pdData1, pdElementH1,
+        size1 * elementSize,
+        size1 * elementSize,
+        1, false, i);
+    drawGrid(gridDataHalf, gridElementH,
+        size2 + 1, size1 + 1,
+        elementSize, "half", i);
 
     reinitHalfMunkres(size1 + 1, size2 + 1, costMatrixHalf);
     while (!isHalfMunkresOver()) {
@@ -69,12 +81,12 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
     }
 
     // Assign.
-    let bp1 = bourrinpd[i];
-    let bp2 = bourrinpd[i+1];
+    let bp1 = allPDsInOneArray[i];
+    let bp2 = allPDsInOneArray[i+1];
     let m = new Map();
     let seg = [];
-    let t1 = 2 * Math.PI * i / nbDiagBourrin;
-    let t2 = 2 * Math.PI * (i+1) / nbDiagBourrin;
+    let t1 = 2 * Math.PI * i / nbTotalPDs;
+    let t2 = 2 * Math.PI * (i+1) / nbTotalPDs;
 
     for (let a = 0; a < size1; ++a) {
         for (let b = 0; b < size2; ++b) {
@@ -137,8 +149,6 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
 }
 
 // Process trackings.
-//console.log(bourrinpd);
-//console.log(TTT);
 TT.push(TTT[0]);
 for (let i = 0; i < TTT.length - 2; ++i) {
     let newT = [];
@@ -209,195 +219,6 @@ for (let i = 0; i < TT.length; ++i) {
         }
     }
 }
-// console.log(TT);
-
-var halfMunkresRunningInterval;
-function launchHalfMunkres(
-    s1, s2, drawable, gridData,
-    gridElement, costMatrix, deltaT,
-    maxValue, drawableDiag1, drawableDiag2,
-    callback)
-{
-    if (halfMunkresRunningInterval) return;
-    reinitHalfMunkres(s1 + 1, s2 + 1, costMatrix); // + 1 for diagonal col+row
-    halfMunkresRunningInterval = setInterval(function() {
-        solveHalfMunkres(
-            s1 + 1, s2 + 1, costMatrix,
-            gridData, drawable, gridElement, elementSize,
-            maxValue, drawableDiag1, drawableDiag2,
-            callback);
-    }, deltaT);
-}
-
-function demoHalfMunkres(
-    s1, s2,
-    drawableDiag1, drawableDiag2, drawableGrid,
-    gridData, gridElement, costMatrixHalf, deltaT,
-    maxValue,
-    callback)
-{
-    var offset = 1;
-    var el = elementSize; // I want H=200
-    var width = s1 * el;
-    var height = s2 * el;
-
-    drawableDiag1[0]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("x1", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("y1", function (d) {
-            return 4 + Math.floor(height * (offset - d.x));
-        })
-        .attr("x2", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("y2", function (d) {
-            return 4 + Math.floor(height * (offset - d.x - d.y));
-        })
-        .on('end', _ =>
-            launchHalfMunkres(
-                s1, s2, drawableGrid,
-                gridData, gridElement, costMatrixHalf, deltaT,
-                maxValue, drawableDiag1, drawableDiag2,
-                callback));
-
-    drawableDiag1[3]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("cx", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("cy", function (d) {
-            return 4 + Math.floor(height * (offset - d.x - d.y));
-        });
-    drawableDiag1[2]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("cx", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("cy", function (d) {
-            return 4 + Math.floor(height * (offset - d.x));
-        });
-    drawableDiag1[1]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .style('opacity', 0);
-
-    drawableDiag2[0]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("x1", function (d) {
-            return 4 + Math.floor(width * (offset - d.x));
-        })
-        .attr("y1", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("x2", function (d) {
-            return 4 + Math.floor(width * (offset - d.x - d.y));
-        })
-        .attr("y2", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        });
-    drawableDiag2[1]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .style('opacity', 0);
-    drawableDiag2[3]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("cy", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("cx", function (d) {
-            return 4 + Math.floor(width * (offset - d.x - d.y));
-        });
-    drawableDiag2[2]
-        .transition()
-        .delay(1000)
-        .duration(1000)
-        .attr("cy", function (d) {
-            return 2 + Math.floor(0.5 * el + offset + el * d.i);
-        })
-        .attr("cx", function (d) {
-            return 4 + Math.floor(width * (offset - d.x));
-        });
-}
-
-function updateGridData(s1, s2, gdata, costm, markm) {
-    let max = 0;
-    for (let i = 0; i < s1; ++i) {
-        for (let j = 0; j < s2; ++j) {
-            max = Math.max(costm[i][j], max);
-        }
-    }
-
-    for (var i = 0; i < s1; ++i) {
-        for (var j = 0; j < s2; ++j) {
-            if (i === s1 - 1 && j === s2 - 1) continue;
-            if (markm[i][j] === 1)
-                gdata[i][j].cost = -1;
-            else if (markm[i][j] === 2)
-                gdata[i][j].cost = -2;
-            else
-                gdata[i][j].cost = (1 / max) * costm[i][j];
-        }
-    }
-}
-
-function updateHalfCostDrawable(matrix, masks, s1, s2, id, maxValue)
-{
-    let cost = 0;
-    for (let i = 0; i < s1 - 1; ++i) {
-        let isRowComplete = false;
-        for (let j = 0; j < s2 - 1; ++j) {
-            if (masks[i][j] === 1) {
-                isRowComplete = true;
-                cost += matrix[i][j];
-            }
-        }
-        if (!isRowComplete)
-            cost += matrix[i][s2 - 1];
-    }
-    for (let j = 0; j < s2; ++j) {
-        cost += masks[s1 - 1][j] === 1 ? matrix[s1 - 1][j] : 0;
-    }
-    $(id).text("Cost = " + cost.toFixed(5));
-    $(id + "i").text("Iterations = " + iter);
-}
-
-function updateHalfDrawable(gridData, drawable, gridElement, s1, s2, elementSize)
-{
-    d3.select("#drawablehalf").remove();
-    drawGrid(gridData, gridElement, s2, s1, elementSize, "half");
-}
-
-function solveHalfMunkres(
-    s1, s2, costMatrix, gridData, drawable, gridElement, elementSize,
-    maxValue, drawableDiag1, drawableDiag2, callback)
-{
-    if (isHalfMunkresOver()) {
-        clearInterval(halfMunkresRunningInterval);
-        if (callback) callback();
-        return;
-    }
-
-    runHalfMunkresRound();
-    updateGridData(s1, s2, gridData, C, M);
-
-    updateHalfCostDrawable(costMatrix, M, s1, s2, "#halfcost", maxValue);
-    updateHalfDrawable(gridData, drawable, gridElement, s1, s2, elementSize);
-    // updatePersitenceDiagramDrawable(M, s1, s2, drawableDiag1, drawableDiag2, "half");
-}
 
 function reinitHalfMunkres(s1, s2, costMatrix) {
     setInput(s1, s2, costMatrix);
@@ -445,7 +266,6 @@ var rowSize = 0;
 var colSize = 0;
 
 function isZero(t) {
-    // return std::abs((double) t) < 1e-15;
     return t === 0.;
 }
 
@@ -934,9 +754,10 @@ function stepSix(step) // ~ 35% perf
     return step;
 }
 
+var debugLevel1 = false;
 function stepSeven(step) {
-    console.log("[HalfMunkres] " + iter + " iterations.");
+    if (debugLevel1) console.log("[HalfMunkres] " + iter + " iterations.");
     return step;
 }
 
-export {TTT, TT};
+export {TTT};

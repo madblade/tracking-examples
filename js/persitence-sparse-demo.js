@@ -1,9 +1,8 @@
 
 var sizeX = 50;
 var sizeY = 25;
-//var sizeX = 40;
-//var sizeY = 20;
 var elementSize = 5; // pixels
+var debugLevel1 = false;
 
 function upperNeighbors(octoPoint, f)
 {
@@ -188,7 +187,7 @@ function computePersistenceDiagram(s1, s2, f)
                             builtPair = true;
                             console.log('Should only happen once: min matched max.');
                         } else {
-                            console.log('Reached a max before a saddle.');
+                            if (debugLevel1) console.log('Reached a max before a saddle.');
                         }
                     }
                     else if (starterType === "sad") {
@@ -241,7 +240,8 @@ function computePersistenceDiagram(s1, s2, f)
                     nbMaxNotAssigned++;
                     unassignedMaxs.push(c);
                     if (nbMaxNotAssigned > 1) {
-                        console.log('A max was not assigned, this should only happen on the border.');
+                        if (debugLevel1)
+                            console.log('A max was not assigned, this should only happen on the border.');
                     }
                 }
                 else if (ct === 'min' || ct === 'sad')
@@ -324,25 +324,13 @@ function computePersistenceDiagram(s1, s2, f)
     return [cps, persistenceDiagram];
 }
 
-function computeD3PersistenceDiagram(sizeX, sizeY, pd, f)
-{
-    let pers = [];
-    for (let i = 0; i < pd.length; ++i) {
-        let cpd = pd[i];
-        let min = cpd[0];
-        let max = cpd[1];
-        let x = f(min[0], min[1]);
-        let y = f(max[0], max[1]) - x;
-        pers.push({x: x, y: y, i: i});
-    }
-    return pers;
-}
-
 var stretcher = 1.0;
 var PI = Math.PI;
 
 // My function:
-// 1.570796 + .6 * sin(x - y + 2 * sin(y)) + .3 * sin(x * 2 + y * 2 * 1.81) + .1825 * sin(x * 3 - y * 2 * 2.18)) -.5
+// 1.570796 + .6 * sin(x - y + 2 * sin(y)) +
+// .3 * sin(x * 2 + y * 2 * 1.81) +
+// .1825 * sin(x * 3 - y * 2 * 2.18)) -.5
 function multisine(x, y) {
     let t = Math.PI * 0.9;
 
@@ -372,15 +360,19 @@ var emitSurfaceBlopTime = function (emit, x, y, i, j, t) {
     return emit(x, y, multisineT(t1, x, y));
 };
 
-var bourrinpd = [];
-var bourrincrit = [];
-var nbDiagBourrin = 100;
-for (let i = 0; i < nbDiagBourrin; ++i) {
-    let t1 = 2 * Math.PI * i / nbDiagBourrin;
-    let pdandcrit = computePersistenceDiagram(sizeX, sizeY, (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
-    bourrincrit.push(pdandcrit[0]);
-    bourrinpd.push(pdandcrit[1]);
-    console.log(i + ' th persistence diagram computed...');
+var allPDsInOneArray = [];
+var allCritsInOneArray = [];
+var nbTotalPDs = 100;
+for (let i = 0; i < nbTotalPDs; ++i) {
+    let t1 = 2 * Math.PI * i / nbTotalPDs;
+    let pdandcrit =
+        computePersistenceDiagram(sizeX, sizeY,
+            (x, y) => multisineT(t1, x*4/sizeX-2, y*4/sizeY-2));
+    allCritsInOneArray.push(pdandcrit[0]);
+    allPDsInOneArray.push(pdandcrit[1]);
+    if (i % 20 === 0) {
+        console.log('[Persistence] Persistent homology computation ' + i + '%...');
+    }
 }
 
 var emitCriticalMin = function(a, b, c) {
@@ -394,12 +386,9 @@ var emitCriticalSad = function(a, b, c) {
 };
 
 var emitCriticalPoints = function(emit, i, t, type) {
-    //let criticalPoints = computeCriticalPoints(sizeX, sizeY,
-    // (x, y)=>multisineT(t, x*4/sizeX-2, y*4/sizeY-2));
-    //let current = criticalPoints[i];
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
-    let it = Math.floor(t1 * nbDiagBourrin);
-    let bc = bourrincrit[it];
+    let it = Math.floor(t1 * nbTotalPDs);
+    let bc = allCritsInOneArray[it];
     if (!bc || !bc[i] || bc[i][2] !== type)
     {
         return emit(Infinity,Infinity,Infinity);
@@ -408,43 +397,7 @@ var emitCriticalPoints = function(emit, i, t, type) {
     let x = bci[0]*4/sizeX-2;
     let y = bci[1]*4/sizeY-2;
     let v = bci[3];
-    // console.log(bci[3]);
-    //return emit(x, y, bci[3]);
     return emit(x, y, v);
-};
-
-// console.log(bourrinpd);
-var emitTrackingBis = function(emit, x, y, i, j) {
-    let T = TT[i];
-    if (!T) {
-        for (let ii = i; ii >= 0; --ii)
-        {
-            T = TT[ii];
-            if (T) break;
-        }
-        // return emit(0,0,0);
-    }
-    var sextuplet = T[j];
-    if (!sextuplet) {
-        for (let jj = j; jj >= 0; --jj) {
-            if (T[jj]) {
-                sextuplet = T[jj];
-                break;
-            }
-        }
-    }
-    let x0 = sextuplet[0];
-    let y0 = sextuplet[1];
-    let z0 = sextuplet[2];
-    let x1 = sextuplet[3];
-    let y1 = sextuplet[4];
-    let z1 = sextuplet[5];
-    var newX, newY, newZ;
-    var factor = 0;
-    newX = x0 + (factor) * (x1 - x0);
-    newY = y0 + (factor) * (y1 - y0);
-    newZ = z0 + (factor) * (z1 - z0); // multisineT(t, newX, newY);
-    return emit(newX, newY, newZ);
 };
 
 var emitTrackingFix = function(TTT) {
@@ -452,7 +405,6 @@ var emitTrackingFix = function(TTT) {
         let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
         let maxSlice = Math.floor(t1 * (TTT.length - 1));
 
-        // let i2 = (i - (i % 2)) / 2;
         let idSlice = 0;
         let idSeg = 0;
         let currentSlice = TTT[idSlice];
@@ -481,8 +433,8 @@ var emitTrackingFix = function(TTT) {
 
 var emitCriticalPath = function(emit, x, y, i, j, t) {
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
-    let it = Math.floor(t1 * nbDiagBourrin);
-    let bc = bourrinpd[it];
+    let it = Math.floor(t1 * nbTotalPDs);
+    let bc = allPDsInOneArray[it];
     if (!bc) return emit(0, 0, 0);
 
     let bbc = bc[j];
@@ -502,11 +454,10 @@ var emitCriticalPath = function(emit, x, y, i, j, t) {
     return emit(newX, newY, newZ);
 };
 
-let critAndPd = computePersistenceDiagram(sizeX, sizeY, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
+let critAndPd = computePersistenceDiagram(sizeX, sizeY,
+    (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
 let cps = critAndPd[0];
 let pd = critAndPd[1];
-// let d3pd = computeD3PersistenceDiagram(sizeX, sizeY, pd, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
-// console.log(d3pd);
 
 var d1 = [];
 var d2 = [];
@@ -561,7 +512,25 @@ var pathMinToMax = function(emit, x, y, i, j, t) {
     return emit(newX, newY, newZ);
 };
 
-export {bourrinpd, nbDiagBourrin, multisineT, sizeX, sizeY, elementSize, pathMinToMax, emitCriticalMax,
-emitCriticalMin, emitCriticalPath, emitCriticalPoints, emitCriticalSad, emitSurfaceBlop,
-emitSurfaceBlopTime, emitTrackingFix,
-    dataCritMin, dataAllCrit, dataCritMax, dataCritSad, pd};
+export {
+    allPDsInOneArray,
+    nbTotalPDs,
+    multisineT,
+    sizeX,
+    sizeY,
+    elementSize,
+    pathMinToMax,
+    emitCriticalMax,
+    emitCriticalMin,
+    emitCriticalPath,
+    emitCriticalPoints,
+    emitCriticalSad,
+    emitSurfaceBlop,
+    emitSurfaceBlopTime,
+    emitTrackingFix,
+    dataCritMin,
+    dataAllCrit,
+    dataCritMax,
+    dataCritSad,
+    pd
+};

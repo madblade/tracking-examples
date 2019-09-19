@@ -100,8 +100,6 @@ var lindPaletteRGB = [
     [171, 85, 85]
 ];
 
-// var maxVal = Math.sqrt(2);
-
 // Must be normalized.
 function getColor(val)
 {
@@ -124,4 +122,4 @@ function getColor(val)
     return r2h(interp);
 }
 
-export {getColor};
+export { getColor };
