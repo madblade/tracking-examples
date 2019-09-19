@@ -44,8 +44,12 @@ slide
     .area({ axes: [1, 3], channels: 3, width: 20, height: pd.length, expr: emitCriticalPath })
     .line({color: '#f8fffd', size: 15, opacity: 1, zIndex: 2 })
     .slide()
-    .area({ axes: [1, 3], channels: 3, width: 128, height: 128, expr: emitTracking })
-    .line({color: '#000000', size: 20, opacity: 1, zIndex: 2 });
+    .area({ axes: [1, 3], channels: 3, width: 2, height: 1024, expr: emitTrackingFix })
+    .line({color: '#ff0000', size: 20, opacity: 1, zIndex: 2})
+    .slide()
+    // .area({ axes: [1, 3], channels: 3, width: 128, height: 128, expr: emitTracking })
+    // .line({color: '#000000', size: 20, opacity: 1, zIndex: 2 })
+    ;
     //.vector({color: '#000000', size: 10, opacity: 1, zIndex: 2 });
     //.ticks({color: '#000000', opacity: 1, zIndex: 2 });
 

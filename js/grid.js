@@ -50,7 +50,7 @@ function distance(pair1, pair2)
 
     var cBirth = 0.0; //whichEx1 === 0 ? 0.5 : 0.0;
     var cDeath = 1.0; //whichEx1 === 0 ? 0.0 : 0.5;
-    var cGX = 1.0;
+    var cGX = 10.0;
     var cGY = 1.0;
 
     return Math.sqrt(cBirth * Math.pow(x1 - x2, 2) + cDeath * Math.pow(y1 - y2, 2) +
@@ -265,23 +265,4 @@ function drawGrid(gridData, gridElement, size1, size2, elementSize, gridType, in
         });
 
     return column;
-}
-
-function animateGrid(column, acc)
-{
-    column
-        // .transition(0)
-        .attr("style", function(d) {
-            let res = "";
-            if (d.lastcol)
-                res = "display:none";
-            else if (acc === 0 && d.cost && d.costD1 !== undefined && d.costD2 !== undefined &&
-                    d.cost > d.costD1 + d.costD2)
-                res = "fill:#020202;opacity:0.8;";
-            else {
-                let col = getColor(d.cost);
-                res = "fill: " + col + ";";
-            }
-            return res;
-        });
 }

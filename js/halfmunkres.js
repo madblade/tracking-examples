@@ -57,7 +57,6 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
     //var d1HM = drawDiagram(pdData2, pdElementH2, size2 * elementSize, size2 * elementSize, 1, false, i);
     var d2HM = drawDiagram(pdData1, pdElementH1, size1 * elementSize, size1 * elementSize, 1, false, i);
     var gH = drawGrid(gridDataHalf, gridElementH, size2 + 1, size1 + 1, elementSize, "half", i);
-    // console.log('OOPS BABY I DID IT AGAIN');
 
     reinitHalfMunkres(size1 + 1, size2 + 1, costMatrixHalf);
     while (!isHalfMunkresOver()) {
@@ -122,7 +121,7 @@ for (let i = 0; i < bourrinpd.length - 2; ++i) {
 
                 let v2 = multisineT(t2, x2, y2);
                 let dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-                if (dist < 0.1) {
+                if (dist < 0.3) {
                     seg.push([x1, y1, v1, x2, y2, v2]);
                 }
             }
@@ -205,7 +204,7 @@ for (let i = 0; i < TT.length; ++i) {
         }
     }
 }
-// console.log(TT);
+console.log(TT);
 
 var halfMunkresRunningInterval;
 function launchHalfMunkres(

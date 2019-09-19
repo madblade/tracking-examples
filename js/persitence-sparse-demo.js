@@ -410,7 +410,8 @@ var emitCriticalSad = function(a, b, c) {
 };
 
 var emitCriticalPoints = function(emit, i, t, type) {
-    //let criticalPoints = computeCriticalPoints(sizeX, sizeY, (x, y)=>multisineT(t, x*4/sizeX-2, y*4/sizeY-2));
+    //let criticalPoints = computeCriticalPoints(sizeX, sizeY,
+    // (x, y)=>multisineT(t, x*4/sizeX-2, y*4/sizeY-2));
     //let current = criticalPoints[i];
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
     let it = Math.floor(t1 * nbDiagBourrin);
@@ -462,6 +463,36 @@ var emitTrackingBis = function(emit, x, y, i, j) {
     return emit(newX, newY, newZ);
 };
 
+var emitTrackingFix = function(emit, x, y, i, j, t) {
+    let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
+    let maxSlice = Math.floor(t1 * (TTT.length - 1));
+
+    // let i2 = (i - (i % 2)) / 2;
+    let idSlice = 0;
+    let idSeg = 0;
+    let currentSlice = TTT[idSlice];
+    let currentSeg = currentSlice[idSeg];
+    let counter = 0;
+    while (counter < j) {
+        idSeg++;
+        if (idSeg >= currentSlice.length) {
+            idSeg = 0;
+            idSlice++;
+            if (idSlice >= maxSlice) {
+                idSlice = 0;
+                return emit(0, 0, 0);
+            }
+            currentSlice = TTT[idSlice];
+        }
+        currentSeg = currentSlice[idSeg];
+        counter++;
+    }
+
+    return i % 2 === 0 ?
+        emit(currentSeg[0], currentSeg[1], currentSeg[2]) :
+        emit(currentSeg[3], currentSeg[4], currentSeg[5]);
+};
+
 var emitTracking = function(emit, x, y, i, j, t) {
     let t1 = (t % (2 * Math.PI)) / (2 * Math.PI);
     let it = Math.floor(t1 * nbDiagBourrin);
@@ -477,7 +508,7 @@ var emitTracking = function(emit, x, y, i, j, t) {
     }
     let T = TT[n];
     if (!T) {
-        //emit(10, 10, 10);
+        //return emit(10, 10, 10);
         for (let jj = n; jj >= 0; --jj) {
             T = TT[jj];
             if (T) break;
@@ -533,17 +564,10 @@ var emitCriticalPath = function(emit, x, y, i, j, t) {
     return emit(newX, newY, newZ);
 };
 
-console.log('WAIT FOR IT');
-console.log('WAIT FOR IT');
-console.log('WAIT FOR IT');
 let critAndPd = computePersistenceDiagram(sizeX, sizeY, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
 let cps = critAndPd[0];
 let pd = critAndPd[1];
-console.log('I COMPUTED THE PERSISTENCE DIAGRAM');
-console.log('I COMPUTED THE PERSISTENCE DIAGRAM');
-console.log('I COMPUTED THE PERSISTENCE DIAGRAM');
-console.log(pd);
-let d3pd = computeD3PersistenceDiagram(sizeX, sizeY, pd, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
+// let d3pd = computeD3PersistenceDiagram(sizeX, sizeY, pd, (x, y)=>multisine(x*4/sizeX-2, y*4/sizeY-2));
 // console.log(d3pd);
 
 var d1 = [];
