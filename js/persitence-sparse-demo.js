@@ -2,7 +2,8 @@
 var sizeX = 50;
 var sizeY = 25;
 var elementSize = 5; // pixels
-var debugLevel1 = false;
+var debugLevel1 = true;
+var debugLevel2 = false;
 
 function upperNeighbors(octoPoint, f)
 {
@@ -187,7 +188,7 @@ function computePersistenceDiagram(s1, s2, f)
                             builtPair = true;
                             console.log('Should only happen once: min matched max.');
                         } else {
-                            if (debugLevel1) console.log('Reached a max before a saddle.');
+                            if (debugLevel2) console.log('Reached a max before a saddle.');
                         }
                     }
                     else if (starterType === "sad") {
@@ -240,8 +241,9 @@ function computePersistenceDiagram(s1, s2, f)
                     nbMaxNotAssigned++;
                     unassignedMaxs.push(c);
                     if (nbMaxNotAssigned > 1) {
-                        if (debugLevel1)
+                        if (debugLevel1) {
                             console.log('A max was not assigned, this should only happen on the border.');
+                        }
                     }
                 }
                 else if (ct === 'min' || ct === 'sad')
@@ -277,47 +279,93 @@ function computePersistenceDiagram(s1, s2, f)
     // Actually this code is old and I have neither the time
     // nor the required motivation to investigate the bug that
     // sometimes isolates a local maximum.
-    if (nbMaxNotAssigned > 1 && unassignedMaxs.length > 1) {
-        let unassignedMax =
-            unassignedMaxs[0][0] === globalMax[0] && unassignedMaxs[0][1] === globalMax[1] ?
-                unassignedMaxs[1] : unassignedMaxs[0];
-
-        // Find an unassigned saddle (on the border preferably)
-        let unassignedSad = null;
-        for (let i = 0; i < cps.length; ++i) {
-            let current = cps[i];
-            if (current[2] !== 'sad') continue;
-            let currentX = current[0];
-            let currentY = current[1];
-            let foundInDiag = false;
-            for (let j = 0; j < persistenceDiagram.length; ++j) {
-                let cpp = persistenceDiagram[j];
-                if (currentX === cpp[0][0] && currentY === cpp[0][1] ||
-                    currentX === cpp[1][0] && currentY === cpp[1][1])
-                {
-                    foundInDiag = true;
-                    break;
-                }
+    if (nbMaxNotAssigned > 0 && unassignedMaxs.length > 0) {
+        let unassignedMax = null;
+        let goOn = true;
+        let needTwo = false;
+        if (nbMaxNotAssigned > 1) {
+            let m1 = unassignedMaxs[0];
+            let m2 = unassignedMaxs[1];
+            if ((m1[0] !== globalMax[0] || m1[1] !== globalMax[1]) &&
+                (m2[0] !== globalMax[0] || m2[1] !== globalMax[1]))
+            {
+                needTwo = true;
             }
-            if (foundInDiag) continue;
-            // if (currentX !== 0 && currentY !== 0) continue;
-            unassignedSad = current;
-            break;
-        }
 
-        if (!!unassignedSad) {
-            persistenceDiagram.push([
-                [unassignedSad[0], unassignedSad[1]], [unassignedMax[0], unassignedMax[1]],
-                1
-            ]);
+            if (!needTwo) {
+                if (m1[0] === globalMax[0] && m1[1] === globalMax[1])
+                    unassignedMax = unassignedMaxs[1];
+                else
+                    unassignedMax = unassignedMaxs[0];
+            }
         } else {
-            console.log('I could not fix the dangling max by searching a lone saddle. ');
-
-            console.log(unassignedMax);
-            console.log(cps);
-            console.log(persistenceDiagram);
-            console.log('Fixing a bad choke');
+            if (unassignedMaxs[0][0] === globalMax[0] && unassignedMaxs[0][1] === globalMax[1]) {
+                goOn = false;
+            } else {
+                unassignedMax = unassignedMaxs[0];
+            }
         }
+
+        if (goOn) {
+            // Find an unassigned saddle (on the border preferably)
+            let unassignedSads = [];
+            for (let i = 0; i < cps.length; ++i) {
+                let current = cps[i];
+                if (current[2] !== 'sad') continue;
+                let currentX = current[0];
+                let currentY = current[1];
+                let foundInDiag = false;
+                for (let j = 0; j < persistenceDiagram.length; ++j) {
+                    let cpp = persistenceDiagram[j];
+                    if (currentX === cpp[0][0] && currentY === cpp[0][1] ||
+                        currentX === cpp[1][0] && currentY === cpp[1][1])
+                    {
+                        foundInDiag = true;
+                        break;
+                    }
+                }
+                if (foundInDiag) continue;
+                // if (currentX !== 0 && currentY !== 0) continue;
+                unassignedSads.push(current);
+                if (!needTwo)
+                    break;
+            }
+
+            if (unassignedSads.length > 0) {
+                if (debugLevel1) {
+                    console.log('Fixing with a saddle ');
+                }
+                if (!needTwo) {
+                    persistenceDiagram.push([
+                        [unassignedSads[0][0], unassignedSads[0][1]], [unassignedMax[0], unassignedMax[1]],
+                        1
+                    ]);
+                } else {
+                    if (unassignedSads.length > 1) {
+                        persistenceDiagram.push([
+                            [unassignedSads[0][0], unassignedSads[0][1]],
+                            [unassignedMaxs[0][0], unassignedMaxs[0][1]],
+                            1
+                        ]);
+                        persistenceDiagram.push([
+                            [unassignedSads[1][0], unassignedSads[1][1]],
+                            [unassignedMaxs[1][0], unassignedMaxs[1][1]],
+                            1
+                        ]);
+                    } else {
+                        console.log('Could not fix.');
+                    }
+                }
+            } else {
+                console.log('I could not fix the dangling max by searching a lone saddle. ');
+
+                console.log(unassignedMax);
+                console.log(cps);
+                console.log(persistenceDiagram);
+                console.log('Fixing a bad choke');
+            }
+        }
+
     }
 
     persistenceDiagram.unshift([[globalMin[0], globalMin[1]], [globalMax[0], globalMax[1]], 1]);
@@ -332,7 +380,7 @@ var PI = Math.PI;
 // .3 * sin(x * 2 + y * 2 * 1.81) +
 // .1825 * sin(x * 3 - y * 2 * 2.18)) -.5
 function multisine(x, y) {
-    let t = Math.PI * 0.9;
+    let t = Math.PI * 0.59;
 
     let xx = x * stretcher;
     let yy = y * stretcher;

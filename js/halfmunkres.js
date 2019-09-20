@@ -32,7 +32,8 @@ for (let i = 0; i < allPDsInOneArray.length; ++i)
         let val1 = multisineT(t1, x1, y1);
         let val2 = multisineT(t1, x2, y2);
         if (val1 > val2) {
-            let tt = val1; val1 = val2; val2 = val1;
+            let tt = val1; val1 = val2; val2 = tt;
+            whichEx = whichEx ? 0 : 1;
         }
         let xx = 0.8 * (Math.min(val1, val2) - min) / range;
         let yy = 0.8 * (Math.abs(val1 - val2) - min) / range;
@@ -137,10 +138,10 @@ for (let i = 0; i < allPDsInOneArray.length - 2; ++i)
                 }
 
                 let v2 = multisineT(t2, x2, y2);
-                let dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
-                if (dist < 0.3) {
-                    seg.push([x1, y1, v1, x2, y2, v2]);
-                }
+                // let dist = Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+                // if (dist < 0.3) {
+                seg.push([x1, y1, v1, x2, y2, v2]);
+                // }
             }
         }
     }
